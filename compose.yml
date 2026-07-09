@@ -1,0 +1,10 @@
+services:
+
+  app:
+    image: denoland/deno:latest
+    restart: unless-stopped
+    volumes:
+      - ./services/app:/app
+    ports:
+      - 9000:9000
+    command: tail -f /dev/null
