@@ -1,5 +1,12 @@
 {
     "imports": {
-        "hono": "jsr:@hono/hono@^4"
+        "argon2id": "jsr:@rabbit-company/argon2id",
+        "hono": "jsr:@hono/hono@^4",
+        "sqlite": "jsr:@db/sqlite"
+    },
+    "tasks": {
+        "start": "deno run -A main.ts",
+        "dev": "deno run --watch -A main.ts",
+        "create-user": "deno run -A scripts/create-user.ts"
     }
 }

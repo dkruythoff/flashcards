@@ -7,4 +7,5 @@ services:
       - ./services/app:/app
     ports:
       - 9000:9000
-    command: tail -f /dev/null
+    working_dir: /app
+    command: deno task dev
