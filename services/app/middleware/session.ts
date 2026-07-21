@@ -2,10 +2,11 @@ import { createMiddleware } from "hono/factory";
 import { getCookie } from "hono/cookie";
 import { db } from "../db/index.ts";
 
+export type SessionRole = "teacher" | "student";
 export type Session = {
   username: string;
   userId: number;
-  role: string;
+  role: SessionRole;
 };
 
 export const attachSession = createMiddleware<{
@@ -33,7 +34,7 @@ export const attachSession = createMiddleware<{
 
   const user = db
     .prepare("SELECT username, role FROM users WHERE id = ?")
-    .get(row.user_id) as { username: string; role: string };
+    .get(row.user_id) as { username: string; role: SessionRole };
 
   if (!user) {
     c.set("session", null);
