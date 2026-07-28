@@ -1,0 +1,37 @@
+import { createMiddleware } from "hono/factory";
+import { AppEnv } from "../app/types.ts";
+import { Session } from "./session.ts";
+
+export type NavItem = { label: string; href: string; active?: boolean };
+
+const buildNav = (session: Session | null, path: string): NavItem[] => {
+  if (!session) return [];
+  const nav: NavItem[] = [
+    {
+      href: "/study",
+      label: "Study",
+    },
+  ];
+  if (session.role === "teacher") {
+    nav.push(
+      {
+        href: "/admin/students",
+        label: "Admin: Students",
+      },
+      {
+        href: "/admin/decks",
+        label: "Admin: Decks",
+      },
+    );
+  }
+  return nav.map((item) => ({
+    ...item,
+    active: path === item.href,
+  }));
+};
+
+export const attachNav = createMiddleware<AppEnv>(async (c, next) => {
+  const session = c.get("session"); // relies on attachSession running first
+  c.set("nav", buildNav(session, c.req.path));
+  await next();
+});

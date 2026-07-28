@@ -1,6 +1,7 @@
 import { createMiddleware } from "hono/factory";
 import { getCookie } from "hono/cookie";
 import { db } from "../db/index.ts";
+import { AppEnv } from "../app/types.ts";
 
 export type SessionRole = "teacher" | "student";
 export type Session = {
@@ -9,9 +10,7 @@ export type Session = {
   role: SessionRole;
 };
 
-export const attachSession = createMiddleware<{
-  Variables: { session: Session | null };
-}>(async (c, next) => {
+export const attachSession = createMiddleware<AppEnv>(async (c, next) => {
   const token = getCookie(c, "session");
   if (!token) {
     c.set("session", null);

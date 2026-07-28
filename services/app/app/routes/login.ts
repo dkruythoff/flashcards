@@ -7,7 +7,14 @@ import { type AppEnv } from "../types.ts";
 
 const app = new Hono<AppEnv>();
 
-app.get("/", (c) => c.html(loginPage()));
+app.get("/", (c) =>
+  c.html(
+    loginPage({
+      navigation: c.get("nav"),
+      session: c.get("session"),
+    }),
+  ),
+);
 
 app.post("/", async (c) => {
   const body = await c.req.parseBody();
@@ -22,7 +29,13 @@ app.post("/", async (c) => {
     ? await Argon2id.verify(user.password_hash, password)
     : false;
   if (!user || !valid) {
-    return c.html(loginPage({ error: "Invalid username or password" }));
+    return c.html(
+      loginPage({
+        error: "Invalid username or password",
+        navigation: c.get("nav"),
+        session: c.get("session"),
+      }),
+    );
   }
 
   const token = crypto.randomUUID();

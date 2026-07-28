@@ -1,9 +1,7 @@
 import { createMiddleware } from "hono/factory";
-import type { Session } from "./session.ts";
+import { AppEnv } from "../app/types.ts";
 
-export const requireAuth = createMiddleware<{
-  Variables: { session: Session | null };
-}>(async (c, next) => {
+export const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
   if (!c.get("session")) return c.redirect("/login");
   await next();
 });
