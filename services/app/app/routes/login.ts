@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import { loginPage } from "../../views/index.ts";
-import { db } from "../../db/index.ts";
-import Argon2id from "argon2id";
 import { setCookie } from "hono/cookie";
-import { type AppEnv } from "../types.ts";
+import Argon2id from "argon2id";
+import { loginPage } from "@/views/index.ts";
+import { db } from "@/db/index.ts";
+import { type AppEnv } from "@/app/types.ts";
 
 const app = new Hono<AppEnv>();
 

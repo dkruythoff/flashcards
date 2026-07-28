@@ -1,7 +1,7 @@
 import { createMiddleware } from "hono/factory";
 import { getCookie } from "hono/cookie";
-import { db } from "../db/index.ts";
-import { AppEnv } from "../app/types.ts";
+import { db } from "@/db/index.ts";
+import { AppEnv } from "@/app/types.ts";
 
 export type SessionRole = "teacher" | "student";
 export type Session = {

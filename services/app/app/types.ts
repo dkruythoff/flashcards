@@ -1,4 +1,4 @@
-import type { NavItem, Session } from "../middleware/index.ts";
+import type { NavItem, Session } from "@/middleware/index.ts";
 
 export type AppEnv = {
   Variables: {

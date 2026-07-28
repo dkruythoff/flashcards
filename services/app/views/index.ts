@@ -1,5 +1,5 @@
 import { html, raw } from "hono/html";
-import type { NavItem, Session } from "../middleware/index.ts";
+import type { NavItem, Session } from "@/middleware/index.ts";
 
 export const layout = (props: {
   children?: unknown;

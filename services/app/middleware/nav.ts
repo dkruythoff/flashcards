@@ -1,5 +1,5 @@
 import { createMiddleware } from "hono/factory";
-import { AppEnv } from "../app/types.ts";
+import { AppEnv } from "@/app/types.ts";
 import { Session } from "./session.ts";
 
 export type NavItem = { label: string; href: string; active?: boolean };

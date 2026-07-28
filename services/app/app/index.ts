@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { csrf } from "hono/csrf";
-import { attachNav, attachSession, requireAuth } from "../middleware/index.ts";
+import { attachNav, attachSession, requireAuth } from "@/middleware/index.ts";
 import { admin, login, logout, root, study } from "./routes/index.ts";
 import { type AppEnv } from "./types.ts";
 

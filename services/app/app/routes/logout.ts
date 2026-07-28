@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { deleteCookie, getCookie } from "hono/cookie";
-import { db } from "../../db/index.ts";
-import { type AppEnv } from "../types.ts";
+import { db } from "@/db/index.ts";
+import { type AppEnv } from "@/app/types.ts";
 
 const app = new Hono<AppEnv>();
 
