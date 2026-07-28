@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_cards_deck_front ON cards(deck_id, front);
