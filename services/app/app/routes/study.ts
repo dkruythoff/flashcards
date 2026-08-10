@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { AppEnv } from "@/app/types.ts";
+import { type AppEnv } from "@/app/types.ts";
 import { layout } from "@/views/index.ts";
 
 const app = new Hono<AppEnv>();

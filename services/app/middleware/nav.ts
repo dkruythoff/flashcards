@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
-import { AppEnv } from "@/app/types.ts";
-import { Session } from "./session.ts";
+import { type AppEnv } from "@/app/types.ts";
+import { type Session } from "./session.ts";
 
 export type NavItem = { label: string; href: string; active?: boolean };
 
@@ -26,7 +26,7 @@ const buildNav = (session: Session | null, path: string): NavItem[] => {
   }
   return nav.map((item) => ({
     ...item,
-    active: path === item.href,
+    active: path.startsWith(item.href),
   }));
 };
 

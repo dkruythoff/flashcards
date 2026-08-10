@@ -1,4 +1,7 @@
 {
+    "compilerOptions": {
+        "verbatimModuleSyntax": true
+    },
     "imports": {
         "@/": "./",
         "argon2id": "jsr:@rabbit-company/argon2id",
