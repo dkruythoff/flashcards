@@ -11,6 +11,8 @@
     "tasks": {
         "start": "deno run -A main.ts",
         "dev": "deno run --watch -A main.ts",
-        "create-user": "deno run -A scripts/create-user.ts"
+        "create-user": "deno run -A scripts/create-user.ts",
+        "check": "deno check main.ts scripts/create-user.ts",
+        "lint": "deno lint"
     }
 }
