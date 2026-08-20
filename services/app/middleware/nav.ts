@@ -15,8 +15,8 @@ const buildNav = (session: Session | null, path: string): NavItem[] => {
   if (session.role === "teacher") {
     nav.push(
       {
-        href: "/admin/students",
-        label: "Admin: Students",
+        href: "/admin/users",
+        label: "Admin: Users",
       },
       {
         href: "/admin/decks",
