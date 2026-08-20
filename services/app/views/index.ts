@@ -1,4 +1,4 @@
-import { html, raw } from "hono/html";
+import { html } from "hono/html";
 import type { NavItem, Session } from "@/middleware/index.ts";
 
 export const layout = (props: {
@@ -15,12 +15,10 @@ export const layout = (props: {
       <body>
         <header>
           ${props.navigation?.length
-            ? raw(
-                navigation({
-                  session: props.session,
-                  navigation: props.navigation,
-                }),
-              )
+            ? navigation({
+                session: props.session,
+                navigation: props.navigation,
+              })
             : ""}
         </header>
         ${props.children}
@@ -34,23 +32,17 @@ export const navigation = (props: {
   !props?.session || !props.navigation?.length
     ? ""
     : html`<nav>
-        ${raw(
-          logoutForm({
-            session: props.session,
-          }),
-        )}
+        ${logoutForm({
+          session: props.session,
+        })}
         <ul>
-          ${raw(
-            props.navigation
-              .map(
-                (navItem) =>
-                  html`<li>
-                    ${navItem.active
-                      ? html`<span>${navItem.label}</span>`
-                      : html`<a href="${navItem.href}">${navItem.label}</a>`}
-                  </li>`,
-              )
-              .join("\n"),
+          ${props.navigation.map(
+            (navItem) =>
+              html`<li>
+                ${navItem.active
+                  ? html`<span>${navItem.label}</span>`
+                  : html`<a href="${navItem.href}">${navItem.label}</a>`}
+              </li>`,
           )}
         </ul>
       </nav>`;

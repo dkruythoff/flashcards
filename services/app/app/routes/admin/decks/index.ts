@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { type AppEnv } from "@/app/types.ts";
 import { layout } from "@/views/index.ts";
-import { html, raw } from "hono/html";
+import { html } from "hono/html";
 import { createDeck, type Deck, getDecks } from "@/db/decks.ts";
 import { default as detail } from "@/app/routes/admin/decks/:id/index.ts";
 import { loadDeck } from "./middleware.ts";
@@ -42,7 +42,7 @@ const viewDecks = ({
   viewPath: string;
 }) => html`
   <h2>Decks</h2>
-  ${raw(listDecks(decks, viewPath))}
+  ${listDecks(decks, viewPath)}
   <hr />
   <h2>Create a deck</h2>
   <form method="post">
@@ -59,17 +59,13 @@ const listDecks = (decks: Deck[], viewPath: string) =>
   !decks.length
     ? html`<p>No decks yet</p>`
     : html`<ul>
-        ${raw(
-          decks
-            .map(
-              (deck) =>
-                html`<li>
-                  <a href="${viewPath}/${deck.id}">${deck.name}</a> (<a
-                    href="${viewPath}/${deck.id}/cards"
-                    >cards</a
-                  >)
-                </li>`,
-            )
-            .join("\n"),
+        ${decks.map(
+          (deck) =>
+            html`<li>
+              <a href="${viewPath}/${deck.id}">${deck.name}</a> (<a
+                href="${viewPath}/${deck.id}/cards"
+                >cards</a
+              >)
+            </li>`,
         )}
       </ul>`;

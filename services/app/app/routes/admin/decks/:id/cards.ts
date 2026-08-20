@@ -105,14 +105,10 @@ const viewDeckCards = ({ cards }: { cards: Card[] }) =>
 
 const listDeckCards = ({ cards }: { cards: Card[] }) =>
   html`<dl>
-    ${raw(
-      cards
-        .map(
-          (card) =>
-            html`<dt>${card.front}</dt>
-              <dd>${card.back}</dd>`,
-        )
-        .join("\n"),
+    ${cards.map(
+      (card) =>
+        html`<dt>${card.front}</dt>
+          <dd>${card.back}</dd>`,
     )}
   </dl>`;
 

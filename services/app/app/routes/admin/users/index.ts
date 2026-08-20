@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { type AppEnv } from "@/app/types.ts";
 import { layout } from "@/views/index.ts";
 import { addUser, getUsers, type User, type UserRole } from "@/db/users.ts";
-import { html, raw } from "hono/html";
+import { html } from "hono/html";
 
 const app = new Hono<AppEnv>();
 
@@ -89,7 +89,7 @@ const viewUsers = ({
         )}
       </tbody>
     </table>
-    ${raw(viewAddUser(addUserParams))}`;
+    ${viewAddUser(addUserParams)}`;
 
 type AddUserParams = {
   errors?: string[];
