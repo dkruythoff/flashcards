@@ -7,14 +7,22 @@ import { type AppEnv } from "@/app/types.ts";
 
 const app = new Hono<AppEnv>();
 
-app.get("/", (c) =>
-  c.html(
+app.get("/", (c) => {
+  const session = c.get("session");
+
+  if (session) {
+    return c.redirect(
+      session ? (session.role === "teacher" ? "/admin" : "/study") : "/login",
+    );
+  }
+
+  return c.html(
     loginPage({
       navigation: c.get("nav"),
       session: c.get("session"),
     }),
-  ),
-);
+  );
+});
 
 app.post("/", async (c) => {
   const body = await c.req.parseBody();

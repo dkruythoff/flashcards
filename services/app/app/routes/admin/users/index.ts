@@ -3,7 +3,6 @@ import { type AppEnv } from "@/app/types.ts";
 import { layout } from "@/views/index.ts";
 import { addUser, getUsers, type User, type UserRole } from "@/db/users.ts";
 import { html, raw } from "hono/html";
-import { error } from "node:console";
 
 const app = new Hono<AppEnv>();
 
@@ -13,7 +12,7 @@ app.get("/", (c) =>
       children: viewUsers({ users: getUsers() }),
       navigation: c.get("nav"),
       session: c.get("session"),
-      title: "Admin: Students",
+      title: "Admin: Users",
     }),
   ),
 );
@@ -48,12 +47,12 @@ app.post("/", async (c) => {
     return c.html(
       layout({
         children: viewUsers({
-          addUserParams: { username, password, role, errors },
+          addUserParams: { username, role, errors },
           users: getUsers(),
         }),
         navigation: c.get("nav"),
         session: c.get("session"),
-        title: "Admin: Students",
+        title: "Admin: Users",
       }),
     );
   }
@@ -80,15 +79,13 @@ const viewUsers = ({
         </tr>
       </thead>
       <tbody>
-        ${raw(
-          users.map(
-            (user) =>
-              html`<tr>
-                <td>${user.id}</td>
-                <td>${user.username}</td>
-                <td>${user.role}</td>
-              </tr>`,
-          ),
+        ${users.map(
+          (user) =>
+            html`<tr>
+              <td>${user.id}</td>
+              <td>${user.username}</td>
+              <td>${user.role}</td>
+            </tr>`,
         )}
       </tbody>
     </table>
@@ -97,19 +94,17 @@ const viewUsers = ({
 type AddUserParams = {
   errors?: string[];
   username?: string;
-  password?: string;
   role?: UserRole;
 };
 const viewAddUser = ({
   errors = [],
   role = "student",
   username = "",
-  password = "",
 }: AddUserParams) =>
   html`<h2>Add users</h2>
     ${errors?.length
       ? html`<ul>
-          ${raw(errors.map((error) => html`<li>${error}</li>`).join("\n"))}
+          ${errors.map((error) => html`<li>${error}</li>`)}
         </ul>`
       : ""}
     <form method="POST">
@@ -142,7 +137,7 @@ const viewAddUser = ({
       <br />
       <label>
         <span>password</span>
-        <input type="password" name="password" value="${password}" />
+        <input type="password" name="password" />
       </label>
       <br />
       <button type="submit">Save</button>
