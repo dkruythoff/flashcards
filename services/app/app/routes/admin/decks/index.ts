@@ -62,10 +62,8 @@ const listDecks = (decks: Deck[], viewPath: string) =>
         ${decks.map(
           (deck) =>
             html`<li>
-              <a href="${viewPath}/${deck.id}">${deck.name}</a> (<a
-                href="${viewPath}/${deck.id}/cards"
-                >cards</a
-              >)
+              ${deck.name} | <a href="${viewPath}/${deck.id}/cards">cards</a> |
+              <a href="${viewPath}/${deck.id}/assignments">assignments</a>
             </li>`,
         )}
       </ul>`;

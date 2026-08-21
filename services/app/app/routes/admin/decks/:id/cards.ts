@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { type Card, getDeckCards, insertCards } from "@/db/decks.ts";
+import { type Card, type Deck, getDeckCards, insertCards } from "@/db/decks.ts";
 import { layout } from "@/views/index.ts";
-import { html, raw } from "hono/html";
+import { html } from "hono/html";
 import { type DeckEnv } from "../types.ts";
 
 const app = new Hono<DeckEnv>();
@@ -11,7 +11,7 @@ app.get("/", (c) => {
 
   return c.html(
     layout({
-      children: viewDeckCards({ cards: getDeckCards(deck.id) }),
+      children: viewDeckCards({ cards: getDeckCards(deck.id), deck }),
       title: `Deck: ${deck.name}: Cards`,
       navigation: c.get("nav"),
       session: c.get("session"),
@@ -100,8 +100,10 @@ function parseCards(
   return cards;
 }
 
-const viewDeckCards = ({ cards }: { cards: Card[] }) =>
-  cards?.length ? listDeckCards({ cards }) : enterDeckCards({ cards: "" });
+const viewDeckCards = ({ cards, deck }: { cards: Card[]; deck: Deck }) =>
+  html`<h2>Admin: Decks: ${deck.name}: cards</h2>
+    <a href="/admin/decks">back to decks</a>
+    ${cards?.length ? listDeckCards({ cards }) : enterDeckCards({ cards: "" })}`;
 
 const listDeckCards = ({ cards }: { cards: Card[] }) =>
   html`<dl>
