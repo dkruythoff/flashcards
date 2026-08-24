@@ -47,15 +47,11 @@ app.post("/", async (c) => {
   }
 
   const token = crypto.randomUUID();
-  const expiresAt = new Date(
-    Date.now() + 7 * 24 * 60 * 60 * 1000,
-  ).toISOString();
 
   db.exec(
-    "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)",
+    "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, datetime('now', '+7 days'))",
     token,
     user.id,
-    expiresAt,
   );
 
   setCookie(c, "session", token, {

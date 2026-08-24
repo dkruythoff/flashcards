@@ -5,6 +5,8 @@ import { html } from "hono/html";
 import {
   assignToUser,
   getAssignments,
+  isDeckAssignable,
+  MIN_CARDS_FOR_ASSIGNMENT,
   type Deck,
   type DeckAssignment,
 } from "@/db/decks.ts";
@@ -21,6 +23,8 @@ app.get("/", (c) => {
       children: viewDeckAssigments({
         assignments,
         deck,
+        isDeckAssignable: isDeckAssignable(deck.id),
+        minCards: MIN_CARDS_FOR_ASSIGNMENT,
       }),
       title: `Deck: ${deck.name}: Assignments`,
       navigation: c.get("nav"),
@@ -34,11 +38,14 @@ app.post("/", async (c) => {
   const deck = c.get("deck");
   const body = await c.req.parseBody();
   const userId = Number(body.user);
-  const assign = body.assign as (typeof assignOptions)[number];
+  const assignInput = body.assign;
   const user = getUser(userId);
 
-  if (user && assignOptions.includes(assign)) {
-    assignToUser(deck.id, userId, assign !== "0");
+  if (
+    user &&
+    assignOptions.includes(assignInput as (typeof assignOptions)[number])
+  ) {
+    assignToUser(deck.id, userId, assignInput !== "0");
   }
 
   return c.redirect(c.req.path);
@@ -49,27 +56,43 @@ export default app;
 const viewDeckAssigments = ({
   assignments,
   deck,
+  isDeckAssignable,
+  minCards,
 }: {
   assignments: DeckAssignment[];
   deck: Deck;
+  isDeckAssignable: boolean;
+  minCards: number;
 }) =>
   html`<h2>Admin: Deck '${deck.name}': Assignments</h2>
     <a href="/admin/decks">back to decks</a>
-    <dl>
-      ${assignments.map(
-        (a) => html`
-          <dt>${a.username}</dt>
-          <dd>
-            <form method="POST">
-              <input type="hidden" name="user" value="${a.user_id}" />
-              <button name="assign" value="1" ${a.assigned ? " disabled" : ""}>
-                assign
-              </button>
-              <button name="assign" value="0" ${!a.assigned ? " disabled" : ""}>
-                unassign
-              </button>
-            </form>
-          </dd>
-        `,
-      )}
-    </dl>`;
+    ${isDeckAssignable
+      ? html`<dl>
+          ${assignments.map(
+            (a) => html`
+              <dt>${a.username}</dt>
+              <dd>
+                <form method="POST">
+                  <input type="hidden" name="user" value="${a.user_id}" />
+                  <button
+                    name="assign"
+                    value="1"
+                    ${a.assigned ? " disabled" : ""}
+                  >
+                    assign
+                  </button>
+                  <button
+                    name="assign"
+                    value="0"
+                    ${!a.assigned ? " disabled" : ""}
+                  >
+                    unassign
+                  </button>
+                </form>
+              </dd>
+            `,
+          )}
+        </dl>`
+      : html`<p>
+          This deck needs at least ${minCards} cards to be assigned.
+        </p>`}`;

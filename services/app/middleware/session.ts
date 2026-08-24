@@ -5,9 +5,10 @@ import { type AppEnv } from "@/app/types.ts";
 
 export type SessionRole = "teacher" | "student";
 export type Session = {
-  username: string;
-  userId: number;
   role: SessionRole;
+  token: string;
+  userId: number;
+  username: string;
 };
 
 export const attachSession = createMiddleware<AppEnv>(async (c, next) => {
@@ -44,6 +45,13 @@ export const attachSession = createMiddleware<AppEnv>(async (c, next) => {
     userId: row.user_id,
     role: user.role,
     username: user.username,
+    token,
   });
   await next();
 });
+
+type AssertSession = (session: Session | null) => asserts session is Session;
+export const assertSession: AssertSession = (session) => {
+  if (!session)
+    throw new Error("Expected an authenticated session, but none was present");
+};

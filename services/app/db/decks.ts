@@ -1,5 +1,7 @@
 import { db } from "./index.ts";
 
+export const MIN_CARDS_FOR_ASSIGNMENT = 4;
+
 export type Deck = { id: number; name: string; owner_id: number };
 export type Card = { id: number; deck_id: number; front: string; back: string };
 export type DeckAssignment = {
@@ -17,6 +19,16 @@ export const getDecks = () =>
   (db.prepare("SELECT id, name, owner_id FROM decks").all() as
     | Deck[]
     | undefined) ?? [];
+
+export const getDeckCardCount = (deckId: number) =>
+  (
+    db
+      .prepare("SELECT COUNT(*) AS count FROM cards WHERE deck_id = ?")
+      .get(deckId) as { count: number }
+  ).count;
+
+export const isDeckAssignable = (deckId: number) =>
+  getDeckCardCount(deckId) >= MIN_CARDS_FOR_ASSIGNMENT;
 
 export const getDeckCards = (deckId: number) =>
   (db
@@ -55,7 +67,12 @@ export const getAssignments = (deckId: number) =>
     )
     .all(deckId) as DeckAssignment[] | undefined) ?? [];
 
-export const assignToUser = (deckId: number, userId: number, assign: boolean) =>
+export const assignToUser = (
+  deckId: number,
+  userId: number,
+  assign: boolean,
+) => {
+  if (assign && !isDeckAssignable(deckId)) return;
   db.exec(
     assign
       ? "INSERT OR IGNORE INTO deck_assignments (deck_id, student_id) VALUES (?,?)"
@@ -63,3 +80,4 @@ export const assignToUser = (deckId: number, userId: number, assign: boolean) =>
     deckId,
     userId,
   );
+};
