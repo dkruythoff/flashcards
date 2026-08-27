@@ -110,9 +110,79 @@ export const getQuizState = (
 
   if (!answer) return { error: "Answer not found." };
 
+  if (givenAnswerId > -1) {
+    gradeAnswer(session.userId, answer.id, givenAnswerId === answer.id);
+    logAnswer(
+      session.userId,
+      answer.id,
+      quizStateRecord.option_card_ids,
+      givenAnswerId,
+    );
+  }
+
   return {
     answer,
     options,
     token: question_token,
   };
 };
+
+const BOX_INTERVAL_STR = [
+  "+0 seconds", // box 0 — due immediately
+  "+1 days", // box 1 — 1 day
+  "+3 days", // box 2 — 3 days
+  "+7 days", // box 3 — 7 days
+  "+14 days", // box 4 — 14 days
+];
+
+const WRONG_ANSWER_NUDGE_STR = "+5 minutes";
+
+export const gradeAnswer = (
+  userId: number,
+  cardId: number,
+  correct: boolean,
+) => {
+  const current = db
+    .prepare("SELECT box FROM review_state WHERE user_id = ? AND card_id = ?")
+    .get<{ box: number }>(userId, cardId);
+
+  const currentBox = current?.box ?? 0;
+  const nextBox = correct ? Math.min(currentBox + 1, 4) : 0;
+  const delay = correct ? BOX_INTERVAL_STR[nextBox] : WRONG_ANSWER_NUDGE_STR;
+  // const dueAt = new Date(Date.now() + delay).toISOString();
+
+  db.exec(
+    `
+    INSERT INTO
+      review_state
+        (user_id, card_id, box, due_at, last_reviewed_at)
+      VALUES
+        (?, ?, ?, datetime('now', ?), datetime('now'))
+    ON CONFLICT (user_id, card_id) DO UPDATE SET
+       box = excluded.box,
+       due_at = excluded.due_at,
+       last_reviewed_at = excluded.last_reviewed_at`,
+    userId,
+    cardId,
+    nextBox,
+    delay,
+  );
+};
+
+export const logAnswer = (
+  userId: number,
+  cardId: number,
+  options: string,
+  answerId: number,
+) =>
+  db.exec(
+    `
+  INSERT INTO
+    answers (user_id, card_id, option_card_ids, answer_id)
+    VALUES (?, ?, ?, ?)
+  `,
+    userId,
+    cardId,
+    options,
+    answerId,
+  );

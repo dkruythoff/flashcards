@@ -43,6 +43,8 @@ app.post("/", async (c) => {
   const question_token = body.token as string;
   const answer = Number(body.answer);
 
+  // TODO: Prevent someone from posting the same answer to the same question over and over
+
   assertSession(session);
 
   const quizState = getQuizState(session, question_token, answer);
@@ -64,7 +66,7 @@ app.post("/", async (c) => {
                     .filter((s) => !!s)
                     .join(" ");
                   return html`<p class="${classes}">
-                    ${o.isAnswer && " ✅"} ${o.isWrong && " ❌"} ${o.back}
+                    ${o.isAnswer && "✅ "} ${o.isWrong && "❌ "} ${o.back}
                   </p>`;
                 })}
               </div>
