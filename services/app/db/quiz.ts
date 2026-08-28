@@ -118,6 +118,7 @@ export const getQuizState = (
       quizStateRecord.option_card_ids,
       givenAnswerId,
     );
+    db.exec("DELETE FROM quiz_state WHERE question_token = ?", question_token);
   }
 
   return {
@@ -149,7 +150,6 @@ export const gradeAnswer = (
   const currentBox = current?.box ?? 0;
   const nextBox = correct ? Math.min(currentBox + 1, 4) : 0;
   const delay = correct ? BOX_INTERVAL_STR[nextBox] : WRONG_ANSWER_NUDGE_STR;
-  // const dueAt = new Date(Date.now() + delay).toISOString();
 
   db.exec(
     `

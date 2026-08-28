@@ -16,7 +16,6 @@ app.get("/", (c) => {
   return c.html(
     layout({
       children: html`
-        <pre hidden>${JSON.stringify(quizState, undefined, 2)}</pre>
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
           : html`<p>${quizState.answer.front}</p>
@@ -43,8 +42,6 @@ app.post("/", async (c) => {
   const question_token = body.token as string;
   const answer = Number(body.answer);
 
-  // TODO: Prevent someone from posting the same answer to the same question over and over
-
   assertSession(session);
 
   const quizState = getQuizState(session, question_token, answer);
@@ -52,7 +49,6 @@ app.post("/", async (c) => {
   return c.html(
     layout({
       children: html`
-        <pre hidden>${JSON.stringify({ answer, quizState }, undefined, 2)}</pre>
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
           : html`<p>${quizState.answer.front}</p>
