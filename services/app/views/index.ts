@@ -29,7 +29,7 @@ export const navigation = (props: {
   navigation?: NavItem[];
   session?: Session | null;
 }) =>
-  !props?.session || !props.navigation?.length
+  !props?.session || !props.navigation?.length || props.navigation.length < 2
     ? ""
     : html`<nav>
         ${logoutForm({
@@ -47,32 +47,8 @@ export const navigation = (props: {
         </ul>
       </nav>`;
 
-export const loginPage = (params?: {
-  error?: string;
-  navigation?: NavItem[];
-  session?: Session | null;
-  username?: string;
-}) =>
-  layout({
-    title: "Login",
-    children: html` ${params?.error ? html`<div>${params.error}</div>` : ""}
-      <form action="/login" method="POST">
-        <label>
-          <span>username</span>
-          <input type="text" name="username" value="${params?.username}" />
-        </label>
-        <br />
-        <label>
-          <span>password</span>
-          <input type="password" name="password" />
-        </label>
-        <br />
-        <button type="submit">Log in</button>
-      </form>`,
-  });
-
-export const logoutForm = (params?: { error?: string; session?: Session }) =>
-  html` ${params?.error ? html`<div>${params.error}</div>` : ""}
+const logoutForm = (params?: { error?: string; session?: Session }) =>
+  html`${params?.error ? html`<div>${params.error}</div>` : ""}
     <form action="/logout" method="POST">
       <p>
         logged in as ${params?.session?.username}<br /><button type="submit">

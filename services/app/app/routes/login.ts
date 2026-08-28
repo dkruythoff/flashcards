@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 import { setCookie } from "hono/cookie";
 import Argon2id from "argon2id";
-import { loginPage } from "@/views/index.ts";
+import { layout } from "@/views/index.ts";
 import { db } from "@/db/index.ts";
 import { type AppEnv } from "@/app/types.ts";
+import { html } from "hono/html";
 
 const app = new Hono<AppEnv>();
 
@@ -16,12 +17,7 @@ app.get("/", (c) => {
     );
   }
 
-  return c.html(
-    loginPage({
-      navigation: c.get("nav"),
-      session: c.get("session"),
-    }),
-  );
+  return c.html(viewLogin());
 });
 
 app.post("/", async (c) => {
@@ -37,13 +33,7 @@ app.post("/", async (c) => {
     ? await Argon2id.verify(user.password_hash, password)
     : false;
   if (!user || !valid) {
-    return c.html(
-      loginPage({
-        error: "Invalid username or password",
-        navigation: c.get("nav"),
-        session: c.get("session"),
-      }),
-    );
+    return c.html(viewLogin({ error: "Invalid username or password" }));
   }
 
   const token = crypto.randomUUID();
@@ -68,3 +58,22 @@ app.post("/", async (c) => {
 });
 
 export default app;
+
+export const viewLogin = (params?: { error?: string; username?: string }) =>
+  layout({
+    title: "Login",
+    children: html` ${params?.error ? html`<div>${params.error}</div>` : ""}
+      <form action="/login" method="POST">
+        <label>
+          <span>username</span>
+          <input type="text" name="username" value="${params?.username}" />
+        </label>
+        <br />
+        <label>
+          <span>password</span>
+          <input type="password" name="password" />
+        </label>
+        <br />
+        <button type="submit">Log in</button>
+      </form>`,
+  });
