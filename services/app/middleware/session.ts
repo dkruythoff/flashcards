@@ -1,5 +1,5 @@
 import { createMiddleware } from "hono/factory";
-import { getCookie } from "hono/cookie";
+import { getCookie, setCookie } from "hono/cookie";
 import { db } from "@/db/index.ts";
 import { type AppEnv } from "@/app/types.ts";
 
@@ -48,6 +48,14 @@ export const attachSession = createMiddleware<AppEnv>(async (c, next) => {
       AND expires_at < datetime('now', '+${SESSION_INACTIVITY_DAYS - 1} days')`,
     token,
   );
+
+  setCookie(c, "session", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Strict",
+    path: "/",
+    maxAge: 60 * 60 * 24 * SESSION_INACTIVITY_DAYS,
+  });
 
   c.set("session", {
     userId: row.user_id,

@@ -40,10 +40,12 @@ app.post("/", async (c) => {
   const token = crypto.randomUUID();
 
   db.exec(
-    "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, datetime('now', '+? days'))",
+    `
+    INSERT INTO
+      sessions (token, user_id, expires_at)
+      VALUES (?, ?, datetime('now', '+${SESSION_INACTIVITY_DAYS} days'))`,
     token,
     user.id,
-    SESSION_INACTIVITY_DAYS,
   );
 
   setCookie(c, "session", token, {
@@ -51,7 +53,7 @@ app.post("/", async (c) => {
     secure: true,
     sameSite: "Strict",
     path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: 60 * 60 * 24 * SESSION_INACTIVITY_DAYS,
   });
 
   db.exec("DELETE FROM sessions WHERE expires_at < datetime('now')");

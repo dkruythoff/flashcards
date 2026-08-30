@@ -19,23 +19,28 @@ app.get("/", (c) => {
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
           : html`<div class="quiz">
-              <p class="question">${quizState.answer.front}</p>
-              <div>
-                <form method="POST" class="options">
-                  <input
-                    type="hidden"
-                    name="token"
-                    value="${quizState.token}"
-                  />
-                  ${quizState.options.map(
-                    (o) =>
-                      html`<button name="answer" value="${o.id}" class="option">
-                        ${o.back}
-                      </button>`,
-                  )}
-                </form>
+                <p class="question">${quizState.answer.front}</p>
+                <div>
+                  <form method="POST" class="options">
+                    <input
+                      type="hidden"
+                      name="token"
+                      value="${quizState.token}"
+                    />
+                    ${quizState.options.map(
+                      (o) =>
+                        html`<button
+                          name="answer"
+                          value="${o.id}"
+                          class="option"
+                        >
+                          ${o.back}
+                        </button>`,
+                    )}
+                  </form>
+                </div>
               </div>
-            </div>`}
+              <p class="quiz-row-next">&nbsp;</p>`}
       `,
       navigation: c.get("nav"),
       session: c.get("session"),

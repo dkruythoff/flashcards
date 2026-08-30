@@ -94,14 +94,16 @@ export const getQuizState = (
   if (givenAnswerId > -1 && !optionIds.includes(givenAnswerId))
     return { error: "Given answer not present in quiz." };
 
-  const options = getCards(Number(quizStateRecord.card_id), ...optionIds).map(
-    (o) => {
+  const fetchedCards = new Map(getCards(...optionIds).map((c) => [c.id, c]));
+  const options = optionIds
+    .map((id) => fetchedCards.get(id))
+    .filter((c): c is Card => c !== undefined)
+    .map((o) => {
       const isAnswer = o.id === quizStateRecord.card_id;
       const isCorrect = isAnswer && givenAnswerId === o.id;
       const isWrong = !isAnswer && givenAnswerId === o.id;
       return Object.assign(o, { isAnswer, isCorrect, isWrong });
-    },
-  );
+    });
 
   if (options.length !== MIN_CARDS_FOR_ASSIGNMENT)
     return { error: "Failed to retrieve cards." };

@@ -42,9 +42,13 @@ body {
     max-width: 80rem;
     height: 100vh;
 
-    &>header,
-    &>main {
+    &>header {
         padding: 0.5rem 2rem;
+    }
+
+    &>main {
+        display: grid;
+        grid-template-rows: 1fr 3rem;
     }
 }
 
@@ -161,6 +165,8 @@ input {
 }
 
 .quiz-row-next {
+    margin: 0;
+    padding: 0;
     text-align: center;
 }
 
