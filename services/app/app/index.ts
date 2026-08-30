@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { serveStatic } from "hono/deno";
 import { csrf } from "hono/csrf";
 import {
   attachNav,
@@ -28,3 +29,4 @@ app.route("/login", login);
 app.route("/logout", logout);
 app.route("/admin", admin);
 app.route("/study", study);
+app.use("/*", serveStatic({ root: "./public" }));

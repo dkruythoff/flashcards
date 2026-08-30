@@ -8,12 +8,16 @@ export const layout = (props: {
   title: string;
 }) =>
   html`<!DOCTYPE html>
-    <html>
+    <html lang="en">
       <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>${props.title}</title>
+        <link rel="stylesheet" href="/style.css" />
       </head>
       <body>
         <header>
+          ${props.session ? logoutForm({ session: props.session }) : ""}
           ${props.navigation?.length
             ? navigation({
                 session: props.session,
@@ -21,7 +25,7 @@ export const layout = (props: {
               })
             : ""}
         </header>
-        ${props.children}
+        <main>${props.children}</main>
       </body>
     </html>`;
 
@@ -32,9 +36,6 @@ export const navigation = (props: {
   !props?.session || !props.navigation?.length || props.navigation.length < 2
     ? ""
     : html`<nav>
-        ${logoutForm({
-          session: props.session,
-        })}
         <ul>
           ${props.navigation.map(
             (navItem) =>
@@ -48,11 +49,7 @@ export const navigation = (props: {
       </nav>`;
 
 const logoutForm = (params?: { error?: string; session?: Session }) =>
-  html`${params?.error ? html`<div>${params.error}</div>` : ""}
-    <form action="/logout" method="POST">
-      <p>
-        logged in as ${params?.session?.username}<br /><button type="submit">
-          Log out
-        </button>
-      </p>
-    </form>`;
+  html`<form action="/logout" method="POST" class="form-logout">
+    <span>Logged in as ${params?.session?.username}</span>
+    <button type="submit" class="button">Log out</button>
+  </form>`;

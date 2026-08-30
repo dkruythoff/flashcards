@@ -18,16 +18,24 @@ app.get("/", (c) => {
       children: html`
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
-          : html`<p>${quizState.answer.front}</p>
-              <form method="POST">
-                <input type="hidden" name="token" value="${quizState.token}" />
-                ${quizState.options.map(
-                  (o) =>
-                    html`<button name="answer" value="${o.id}">
-                      ${o.back}
-                    </button>`,
-                )}
-              </form>`}
+          : html`<div class="quiz">
+              <p class="question">${quizState.answer.front}</p>
+              <div>
+                <form method="POST" class="options">
+                  <input
+                    type="hidden"
+                    name="token"
+                    value="${quizState.token}"
+                  />
+                  ${quizState.options.map(
+                    (o) =>
+                      html`<button name="answer" value="${o.id}" class="option">
+                        ${o.back}
+                      </button>`,
+                  )}
+                </form>
+              </div>
+            </div>`}
       `,
       navigation: c.get("nav"),
       session: c.get("session"),
@@ -51,22 +59,29 @@ app.post("/", async (c) => {
       children: html`
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
-          : html`<p>${quizState.answer.front}</p>
-              <div>
-                ${quizState.options.map((o) => {
-                  const classes = [
-                    o.isAnswer ? "is-answer" : "",
-                    o.isCorrect ? "is-correct" : "",
-                    o.isWrong ? "is-wrong" : "",
-                  ]
-                    .filter((s) => !!s)
-                    .join(" ");
-                  return html`<p class="${classes}">
-                    ${o.isAnswer && "✅ "} ${o.isWrong && "❌ "} ${o.back}
-                  </p>`;
-                })}
+          : html`<div class="quiz">
+                <p class="question">${quizState.answer.front}</p>
+                <div>
+                  <div class="options">
+                    ${quizState.options.map((o) => {
+                      return html`<p
+                        class="option ${[
+                          o.isAnswer ? "is-answer" : "",
+                          o.isCorrect ? "is-correct" : "",
+                          o.isWrong ? "is-wrong" : "",
+                        ]
+                          .filter((s) => !!s)
+                          .join(" ")}"
+                      >
+                        ${o.back}
+                      </p>`;
+                    })}
+                  </div>
+                </div>
               </div>
-              <p><a href=".">continue</a></p>`}
+              <p class="quiz-row-next">
+                <a href="." class="button dark">Continue</a>
+              </p>`}
       `,
       navigation: c.get("nav"),
       session: c.get("session"),
