@@ -6,6 +6,6 @@ services:
     volumes:
       - ./services/app:/app
     ports:
-      - 9000:9000
+      - 127.0.0.1:9000:9000
     working_dir: /app
     command: deno task dev

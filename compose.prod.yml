@@ -1,0 +1,4 @@
+services:
+  app:
+    image: denoland/deno:2.9.1
+    command: deno task start
