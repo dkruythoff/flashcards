@@ -5,6 +5,7 @@ import { layout } from "@/views/index.ts";
 import { db } from "@/db/index.ts";
 import { type AppEnv } from "@/app/types.ts";
 import { html } from "hono/html";
+import { SESSION_INACTIVITY_DAYS } from "@/middleware/index.ts";
 
 const app = new Hono<AppEnv>();
 
@@ -39,9 +40,10 @@ app.post("/", async (c) => {
   const token = crypto.randomUUID();
 
   db.exec(
-    "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, datetime('now', '+7 days'))",
+    "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, datetime('now', '+? days'))",
     token,
     user.id,
+    SESSION_INACTIVITY_DAYS,
   );
 
   setCookie(c, "session", token, {
