@@ -19,28 +19,24 @@ app.get("/", (c) => {
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
           : html`<div class="quiz">
-                <p class="question">${quizState.answer.front}</p>
-                <div>
-                  <form method="POST" class="options">
-                    <input
-                      type="hidden"
-                      name="token"
-                      value="${quizState.token}"
-                    />
-                    ${quizState.options.map(
-                      (o) =>
-                        html`<button
-                          name="answer"
-                          value="${o.id}"
-                          class="option"
-                        >
-                          ${o.back}
-                        </button>`,
-                    )}
-                  </form>
-                </div>
+              <p class="question">${quizState.answer.front}</p>
+              <div>
+                <form method="POST" class="options">
+                  <input
+                    type="hidden"
+                    name="token"
+                    value="${quizState.token}"
+                  />
+                  ${quizState.options.map(
+                    (o) =>
+                      html`<button name="answer" value="${o.id}" class="option">
+                        ${o.back}
+                      </button>`,
+                  )}
+                </form>
               </div>
-              <p class="quiz-row-next">&nbsp;</p>`}
+              <p class="quiz-row-next">&nbsp;</p>
+            </div> `}
       `,
       navigation: c.get("nav"),
       session: c.get("session"),
@@ -65,28 +61,28 @@ app.post("/", async (c) => {
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
           : html`<div class="quiz">
-                <p class="question">${quizState.answer.front}</p>
-                <div>
-                  <div class="options">
-                    ${quizState.options.map((o) => {
-                      return html`<p
-                        class="option ${[
-                          o.isAnswer ? "is-answer" : "",
-                          o.isCorrect ? "is-correct" : "",
-                          o.isWrong ? "is-wrong" : "",
-                        ]
-                          .filter((s) => !!s)
-                          .join(" ")}"
-                      >
-                        ${o.back}
-                      </p>`;
-                    })}
-                  </div>
+              <p class="question">${quizState.answer.front}</p>
+              <div>
+                <div class="options">
+                  ${quizState.options.map((o) => {
+                    return html`<p
+                      class="option ${[
+                        o.isAnswer ? "is-answer" : "",
+                        o.isCorrect ? "is-correct" : "",
+                        o.isWrong ? "is-wrong" : "",
+                      ]
+                        .filter((s) => !!s)
+                        .join(" ")}"
+                    >
+                      ${o.back}
+                    </p>`;
+                  })}
                 </div>
               </div>
               <p class="quiz-row-next">
                 <a href="." class="button dark">Continue</a>
-              </p>`}
+              </p>
+            </div> `}
       `,
       navigation: c.get("nav"),
       session: c.get("session"),
