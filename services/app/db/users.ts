@@ -36,6 +36,10 @@ export const addUser = async (
 export const deleteStudent = (userId: number) => {
   db.exec("BEGIN");
   try {
+    db.exec(
+      "DELETE FROM quiz_state WHERE session_token IN (SELECT token FROM sessions WHERE user_id = ?)",
+      userId,
+    );
     db.exec("DELETE FROM answers WHERE user_id = ?", userId);
     db.exec("DELETE FROM review_state WHERE user_id = ?", userId);
     db.exec("DELETE FROM deck_assignments WHERE student_id = ?", userId);
