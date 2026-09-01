@@ -7,7 +7,10 @@ const app = new Hono<AppEnv>();
 
 app.post("/", (c) => {
   const token = getCookie(c, "session");
-  if (token) db.exec("DELETE FROM sessions WHERE token = ?", token);
+  if (token) {
+    db.exec("DELETE FROM quiz_state WHERE session_token = ?", token);
+    db.exec("DELETE FROM sessions WHERE token = ?", token);
+  }
   deleteCookie(c, "session");
   return c.redirect("/login");
 });
