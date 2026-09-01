@@ -1,8 +1,9 @@
 import { Hono } from "hono";
-import { type Card, type Deck, getDeckCards, insertCards } from "@/db/decks.ts";
+import { type Deck, insertCards } from "@/db/decks.ts";
 import { layout } from "@/views/index.ts";
 import { html } from "hono/html";
 import { type DeckEnv } from "../types.ts";
+import { getDeckCards, type Card } from "@/db/cards.ts";
 
 const app = new Hono<DeckEnv>();
 

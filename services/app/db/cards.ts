@@ -60,3 +60,8 @@ LIMIT
   ?`,
     )
     .all<Card>(userId, cardId, MIN_CARDS_FOR_ASSIGNMENT - 1);
+
+export const getDeckCards = (deckId: number) =>
+  db
+    .prepare("SELECT id, front, back FROM cards WHERE deck_id = ?")
+    .all<Card>(deckId);

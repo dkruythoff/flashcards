@@ -3,7 +3,6 @@ import { db } from "./index.ts";
 export const MIN_CARDS_FOR_ASSIGNMENT = 4;
 
 export type Deck = { id: number; name: string; owner_id: number };
-export type Card = { id: number; deck_id: number; front: string; back: string };
 export type DeckAssignment = {
   username: string;
   user_id: number;
@@ -29,11 +28,6 @@ export const getDeckCardCount = (deckId: number) =>
 
 export const isDeckAssignable = (deckId: number) =>
   getDeckCardCount(deckId) >= MIN_CARDS_FOR_ASSIGNMENT;
-
-export const getDeckCards = (deckId: number) =>
-  (db
-    .prepare("SELECT id, deck_id, front, back FROM cards WHERE deck_id = ?")
-    .all(deckId) as Card[] | undefined) ?? [];
 
 export const createDeck = (name: string, ownerId: number) =>
   !!db.exec("INSERT INTO decks (name, owner_id) VALUES (?, ?)", name, ownerId);
