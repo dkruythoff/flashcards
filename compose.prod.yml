@@ -1,4 +1,13 @@
 services:
   app:
-    image: denoland/deno:2.9.1
-    command: deno task start
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - flashcards_data:/app/data
+
+volumes:
+  flashcards_data:
