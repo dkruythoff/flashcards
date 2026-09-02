@@ -22,6 +22,10 @@ const buildNav = (session: Session | null, path: string): NavItem[] => {
         href: "/admin/decks",
         label: "Admin: Decks",
       },
+      {
+        href: "/admin/backup",
+        label: "Admin: Download backup",
+      },
     );
   }
   return nav.map((item) => ({
