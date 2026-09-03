@@ -99,8 +99,7 @@ input {
         gap: 1rem;
 
         &:has(.is-answer) .option:not(.is-answer, .is-corrent, .is-wrong) {
-            border-color: var(--color-flag-es-yellow);
-            color: var(--color-flag-es-yellow);
+            color: #999;
         }
     }
 
