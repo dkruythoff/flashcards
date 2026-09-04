@@ -1,4 +1,10 @@
-import { getCards, getExtraCards, getNextCard, type Card } from "@/db/cards.ts";
+import {
+  getCards,
+  getExtraCards,
+  getNextCard,
+  getNextCardDue,
+  type Card,
+} from "@/db/cards.ts";
 import { db } from "@/db/index.ts";
 import type { Session } from "@/middleware/index.ts";
 import { MIN_CARDS_FOR_ASSIGNMENT } from "@/db/decks.ts";
@@ -13,6 +19,32 @@ type QuizStateError = {
 };
 type QuizStateResponse = QuizState | QuizStateError;
 
+const TIMEZONE = "Europe/Madrid"; // handles CET/CEST switching automatically
+
+const formatDue = (nextDueUtc: string) => {
+  // SQLite's string has no timezone marker at all — it IS UTC, but nothing
+  // says so. Must mark it explicitly before parsing, or JS may guess wrong.
+  const date = new Date(`${nextDueUtc.replace(" ", "T")}Z`);
+  const now = new Date();
+
+  const dayFormatter = new Intl.DateTimeFormat("en-CA", { timeZone: TIMEZONE }); // en-CA => YYYY-MM-DD
+  const today = dayFormatter.format(now);
+  const tomorrow = dayFormatter.format(
+    new Date(now.getTime() + 24 * 60 * 60 * 1000),
+  );
+  const dueDay = dayFormatter.format(date);
+
+  const timeFormatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: TIMEZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const dayLabel =
+    dueDay === today ? "today" : dueDay === tomorrow ? "tomorrow" : dueDay;
+  return `${dayLabel} at ${timeFormatter.format(date)}`;
+};
+
 export const createQuizState = (session: Session): QuizStateResponse => {
   // Clear stale quiz_state rows
   db.exec(`
@@ -23,7 +55,15 @@ export const createQuizState = (session: Session): QuizStateResponse => {
   `);
 
   const answer = getNextCard(session.userId);
-  if (!answer) return { error: "No cards available." };
+  if (!answer) {
+    const nextDue = getNextCardDue(session.userId);
+    if (nextDue) {
+      return {
+        error: `All done for now! Next card available ${formatDue(nextDue)}`,
+      };
+    }
+    return { error: "No cards available." };
+  }
 
   const wrongAnswers = getExtraCards(session.userId, answer.id);
   if (!wrongAnswers?.length) return { error: "Not enough cards available." };

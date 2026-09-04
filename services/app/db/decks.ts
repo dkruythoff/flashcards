@@ -1,3 +1,4 @@
+import { getCardMetricsForUser } from "@/db/cards.ts";
 import { db } from "./index.ts";
 
 export const MIN_CARDS_FOR_ASSIGNMENT = 4;
@@ -74,4 +75,37 @@ export const assignToUser = (
     deckId,
     userId,
   );
+};
+
+export const getAssignedDecksWithMetrics = (userId: number) => {
+  const byDeck = new Map<
+    number,
+    {
+      deck_id: number;
+      name: string;
+      answered: number;
+      correct: number;
+      wrong: number;
+    }
+  >();
+
+  for (const c of getCardMetricsForUser(userId)) {
+    const deck = byDeck.get(c.deck_id) ?? {
+      deck_id: c.deck_id,
+      name: c.deck_name,
+      answered: 0,
+      correct: 0,
+      wrong: 0,
+    };
+    deck.answered += c.answered;
+    deck.correct += c.correct;
+    deck.wrong += c.wrong;
+    byDeck.set(c.deck_id, deck);
+  }
+
+  return [...byDeck.values()].map((d) => ({
+    ...d,
+    correct_pct: d.answered ? Math.round((100 * d.correct) / d.answered) : null,
+    wrong_pct: d.answered ? Math.round((100 * d.wrong) / d.answered) : null,
+  }));
 };

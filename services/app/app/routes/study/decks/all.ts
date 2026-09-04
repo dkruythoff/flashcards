@@ -80,7 +80,7 @@ app.post("/", async (c) => {
                 </div>
               </div>
               <p class="quiz-row-next">
-                <a href="." class="button dark">Continue</a>
+                <a href="${c.req.path}" class="button dark">Continue</a>
               </p>
             </div> `}
       `,
