@@ -36,7 +36,7 @@ html {
 
 body {
     margin: 0 auto;
-    padding: 0;
+    padding: 1rem;
     display: grid;
     grid-template-rows: auto 1fr;
     max-width: 80rem;
@@ -156,12 +156,12 @@ input {
     button.option {
         cursor: pointer;
     }
-}
 
-.quiz-row-next {
-    margin: 0;
-    padding: 0;
-    text-align: center;
+    .quiz-row-next {
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
 }
 
 @media (width > 50rem) {
@@ -170,5 +170,78 @@ input {
             display: grid;
             grid-template-columns: 1fr 1fr;
         }
+    }
+}
+
+.deck-list {
+    --deck-list-cols: 1;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--deck-list-cols), 1fr);
+    align-content: center;
+    gap: 1em;
+
+    & .deck {
+        border: solid 0.2rem black;
+        border-radius: 0.7em;
+        padding: 1em;
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        grid-template-areas: "title title" "count meter";
+
+        &>h3 {
+            grid-area: title;
+            margin: 0 0 0.5em 0;
+        }
+
+        .count {
+            grid-area: count;
+            display: grid;
+            align-items: center;
+            grid-template-columns: auto 1fr;
+            gap: 0.5em;
+
+            .icon {
+                border-radius: 0.2em;
+                border: solid 0.2em black;
+                display: inline-block;
+                height: 1.75ch;
+                aspect-ratio: 1/1.5;
+            }
+        }
+
+        .meter {
+            --pct-g: 50%;
+            --pct-w: 50%;
+            grid-area: meter;
+            --radius: 0.5em;
+            display: grid;
+            grid-template-columns: var(--pct-g) var(--pct-w);
+            align-items: center;
+
+            & .g,
+            & .w {
+                color: white;
+                padding: 0.25em 0;
+                text-align: center;
+            }
+
+            & .g {
+                background-color: var(--color-green-dartmouth);
+                border-radius: var(--radius) 0 0 var(--radius);
+            }
+
+            & .w {
+                background-color: var(--color-flag-es-red);
+                border-radius: 0 var(--radius) var(--radius) 0;
+            }
+        }
+    }
+}
+
+@media (width > 50rem) {
+    .deck-list {
+        --deck-list-cols: 2;
     }
 }

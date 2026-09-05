@@ -45,6 +45,13 @@ const formatDue = (nextDueUtc: string) => {
   return `${dayLabel} at ${timeFormatter.format(date)}`;
 };
 
+export const getNextCardDueMessage = (userId: number) => {
+  const nextDue = getNextCardDue(userId);
+  return nextDue
+    ? `All done for now! Next card available ${formatDue(nextDue)}`
+    : null;
+};
+
 export const createQuizState = (session: Session): QuizStateResponse => {
   // Clear stale quiz_state rows
   db.exec(`
@@ -56,10 +63,10 @@ export const createQuizState = (session: Session): QuizStateResponse => {
 
   const answer = getNextCard(session.userId);
   if (!answer) {
-    const nextDue = getNextCardDue(session.userId);
-    if (nextDue) {
+    const nextDueMessage = getNextCardDueMessage(session.userId);
+    if (nextDueMessage) {
       return {
-        error: `All done for now! Next card available ${formatDue(nextDue)}`,
+        error: nextDueMessage,
       };
     }
     return { error: "No cards available." };

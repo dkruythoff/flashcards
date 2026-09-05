@@ -130,3 +130,18 @@ export const getCardMetricsForUser = (userId: number) =>
 
 export const getCardMetricsForUserCard = (userId: number, cardId: number) =>
   db.prepare(getCardMetricsQuery(true)).get<CardMetrics>(userId, cardId);
+
+export const getCardsDueCount = (userId: number) =>
+  db
+    .prepare(
+      `
+SELECT COUNT(*) AS due_count
+FROM
+    cards AS c
+    JOIN deck_assignments AS da ON da.deck_id = c.deck_id AND da.student_id = ?
+    LEFT JOIN review_state AS rs ON rs.card_id = c.id AND rs.user_id = da.student_id
+WHERE
+    rs.due_at IS NULL OR rs.due_at <= datetime('now')
+`,
+    )
+    .get<{ due_count: number }>(userId)?.due_count ?? 0;

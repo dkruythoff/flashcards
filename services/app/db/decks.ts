@@ -86,6 +86,7 @@ export const getAssignedDecksWithMetrics = (userId: number) => {
       answered: number;
       correct: number;
       wrong: number;
+      card_count: number;
     }
   >();
 
@@ -96,10 +97,12 @@ export const getAssignedDecksWithMetrics = (userId: number) => {
       answered: 0,
       correct: 0,
       wrong: 0,
+      card_count: 0,
     };
     deck.answered += c.answered;
     deck.correct += c.correct;
     deck.wrong += c.wrong;
+    deck.card_count++;
     byDeck.set(c.deck_id, deck);
   }
 

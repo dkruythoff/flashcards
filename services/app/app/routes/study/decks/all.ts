@@ -40,7 +40,7 @@ app.get("/", (c) => {
       `,
       navigation: c.get("nav"),
       session: c.get("session"),
-      title: "Study area",
+      title: `Study area: Due cards${"answer" in quizState ? ` (${quizState.answer.front})` : ""}`,
     }),
   );
 });
