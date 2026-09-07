@@ -4,6 +4,7 @@ import { layout } from "@/views/index.ts";
 import { html } from "hono/html";
 import { assertSession } from "@/middleware/session.ts";
 import { createQuizState, getQuizState } from "@/db/quiz.ts";
+import { getCardsDueCount } from "@/db/cards.ts";
 
 const app = new Hono<AppEnv>();
 
@@ -16,6 +17,8 @@ app.get("/", (c) => {
   return c.html(
     layout({
       children: html`
+        <h2>Study all due cards (${getCardsDueCount(session.userId)})</h2>
+        <a href="${c.req.path.replace(/\/[^/]+$/, "")}">Back to decks</a>
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
           : html`<div class="quiz">
