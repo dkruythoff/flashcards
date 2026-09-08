@@ -214,11 +214,25 @@ input {
         .meter {
             --pct-g: 50%;
             --pct-w: 50%;
-            grid-area: meter;
             --radius: 0.5em;
+            grid-area: meter;
             display: grid;
-            grid-template-columns: var(--pct-g) var(--pct-w);
             align-items: center;
+
+            grid-template-columns: var(--pct-g) var(--pct-w);
+
+            &[data-g="0"],
+            &[data-w="0"] {
+                grid-template-columns: 1fr;
+            }
+
+            &[data-g="0"] .g {
+                display: none;
+            }
+
+            &[data-w="0"] .w {
+                display: none;
+            }
 
             & .g,
             & .w {
@@ -235,6 +249,11 @@ input {
             & .w {
                 background-color: var(--color-flag-es-red);
                 border-radius: 0 var(--radius) var(--radius) 0;
+            }
+
+            &[data-g="0"] .w,
+            &[data-w="0"] .g {
+                border-radius: var(--radius);
             }
         }
     }

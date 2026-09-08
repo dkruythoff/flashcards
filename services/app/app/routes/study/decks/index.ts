@@ -42,6 +42,8 @@ app.get("/", (c) => {
                         : html`<span
                             class="meter"
                             style="--pct-g:${d.correct_pct}%;--pct-w:${d.wrong_pct}%"
+                            data-g="${d.correct_pct}"
+                            data-w="${d.wrong_pct}"
                           >
                             <span class="g">${d.correct}</span>
                             <span class="w">${d.wrong}</span>
