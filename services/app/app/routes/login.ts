@@ -56,7 +56,10 @@ app.post("/", async (c) => {
     maxAge: 60 * 60 * 24 * SESSION_INACTIVITY_DAYS,
   });
 
-  db.exec("DELETE FROM sessions WHERE expires_at < datetime('now')");
+  db.exec(`
+    DELETE FROM quiz_state WHERE session_token IN (SELECT token FROM sessions WHERE expires_at < datetime('now'));
+    DELETE FROM sessions WHERE expires_at < datetime('now');
+  `);
 
   return c.redirect("/study");
 });
