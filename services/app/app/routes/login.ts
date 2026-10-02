@@ -57,9 +57,10 @@ app.post("/", async (c) => {
   });
 
   db.exec(`
-    DELETE FROM quiz_state WHERE session_token IN (SELECT token FROM sessions WHERE expires_at < datetime('now'));
-    DELETE FROM sessions WHERE expires_at < datetime('now');
-  `);
+  DELETE FROM quiz_state WHERE session_token IN (SELECT token FROM sessions WHERE expires_at < datetime('now'));
+  DELETE FROM deck_practice WHERE session_token IN (SELECT token FROM sessions WHERE expires_at < datetime('now'));
+  DELETE FROM sessions WHERE expires_at < datetime('now');
+`);
 
   return c.redirect("/study");
 });

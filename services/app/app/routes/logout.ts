@@ -9,6 +9,7 @@ app.post("/", (c) => {
   const token = getCookie(c, "session");
   if (token) {
     db.exec("DELETE FROM quiz_state WHERE session_token = ?", token);
+    db.exec("DELETE FROM deck_practice WHERE session_token = ?", token);
     db.exec("DELETE FROM sessions WHERE token = ?", token);
   }
   deleteCookie(c, "session");

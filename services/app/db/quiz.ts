@@ -8,6 +8,7 @@ import {
 import { db } from "@/db/index.ts";
 import type { Session } from "@/middleware/index.ts";
 import { MIN_CARDS_FOR_ASSIGNMENT } from "@/db/decks.ts";
+import { logAnswer } from "@/db/answers.ts";
 
 type QuizState = {
   answer: Card;
@@ -217,21 +218,3 @@ export const gradeAnswer = (
     delay,
   );
 };
-
-export const logAnswer = (
-  userId: number,
-  cardId: number,
-  options: string,
-  answerId: number,
-) =>
-  db.exec(
-    `
-  INSERT INTO
-    answers (user_id, card_id, option_card_ids, answer_id)
-    VALUES (?, ?, ?, ?)
-  `,
-    userId,
-    cardId,
-    options,
-    answerId,
-  );

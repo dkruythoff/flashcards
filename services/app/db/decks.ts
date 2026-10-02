@@ -112,3 +112,37 @@ export const getAssignedDecksWithMetrics = (userId: number) => {
     wrong_pct: d.answered ? Math.round((100 * d.wrong) / d.answered) : null,
   }));
 };
+
+export const isDeckAssignedToUser = (deckId: number, userId: number) => {
+  const count =
+    db
+      .prepare(
+        `
+SELECT
+    COUNT(*) AS assignment_count
+FROM
+  deck_assignments AS da
+WHERE
+  da.deck_id = ?
+  AND da.student_id = ?
+    `,
+      )
+      .get<{ assignment_count: number }>(deckId, userId)?.assignment_count || 0;
+
+  return count > 0;
+};
+
+export const getDeckCardIds = (deckId: number) =>
+  db
+    .prepare(
+      `
+SELECT
+    id
+FROM
+    cards
+WHERE
+    deck_id = ?
+    `,
+    )
+    .all<{ id: number }>(deckId)
+    .map((o) => o.id);

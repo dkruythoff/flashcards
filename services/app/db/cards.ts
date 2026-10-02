@@ -53,6 +53,34 @@ LIMIT
     )
     .get<Card>(userId, userId);
 
+export const getNextCardPractice = (deck_id: number, answerIds: number[]) =>
+  db
+    .prepare(
+      `
+SELECT
+    c.id,
+    c.front,
+    c.back
+FROM
+    cards c
+WHERE
+    c.deck_id = ?
+    ${
+      answerIds.length
+        ? `AND c.id NOT IN (
+      SELECT
+        card_id
+      FROM
+        answers
+      WHERE
+        id IN (${answerIds.map(() => "?").join(", ")})
+      )`
+        : ""
+    }
+`,
+    )
+    .get<Card>(deck_id, ...answerIds);
+
 export const getNextCardDue = (userId: number) =>
   db
     .prepare(
@@ -91,6 +119,26 @@ LIMIT
   ?`,
     )
     .all<Card>(userId, cardId, MIN_CARDS_FOR_ASSIGNMENT - 1);
+
+export const getExtraCardsPractice = (deckId: number, cardId: number) =>
+  db
+    .prepare(
+      `
+SELECT
+  c.id,
+  c.front,
+  c.back
+FROM
+  cards AS c
+WHERE
+  c.deck_id = ?
+  AND c.id != ?
+ORDER BY
+  RANDOM()
+LIMIT
+  ?`,
+    )
+    .all<Card>(deckId, cardId, MIN_CARDS_FOR_ASSIGNMENT - 1);
 
 export const getDeckCards = (deckId: number) =>
   db
@@ -145,3 +193,21 @@ WHERE
 `,
     )
     .get<{ due_count: number }>(userId)?.due_count ?? 0;
+
+export const cardBelongsToDeck = (cardId: number, deckId: number) => {
+  const count =
+    db
+      .prepare(
+        `
+SELECT
+  COUNT(*) as count
+FROM
+  cards
+WHERE
+  id = ?
+  AND deck_id = ?
+  `,
+      )
+      .get<{ count: number }>(cardId, deckId)?.count || 0;
+  return count > 0;
+};
