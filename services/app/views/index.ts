@@ -17,6 +17,21 @@ export const layout = (props: {
       </head>
       <body>
         <header>
+          <a href="/" class="logo">
+            <svg
+              viewBox="0 0 24 24"
+              role="img"
+              stroke="#000000"
+              stroke-width="2"
+              fill="none"
+              color="#000000"
+            >
+              <title id="cardsIconTitle">Cards</title>
+              <rect width="13" height="13" x="3" y="3" />
+              <polyline points="16 8 21 8 21 21 8 21 8 16" />
+            </svg>
+            FlashCards
+          </a>
           ${props.session ? logoutForm({ session: props.session }) : ""}
           ${props.navigation?.length
             ? navigation({
@@ -50,6 +65,6 @@ export const navigation = (props: {
 
 const logoutForm = (params?: { error?: string; session?: Session }) =>
   html`<form action="/logout" method="POST" class="form-logout">
-    <span>Logged in as ${params?.session?.username}</span>
+    <span>User: ${params?.session?.username}</span>
     <button type="submit" class="button">Log out</button>
   </form>`;

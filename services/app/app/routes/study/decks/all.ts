@@ -22,7 +22,7 @@ app.get("/", (c) => {
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
           : html`<div class="quiz">
-              <p class="question">${quizState.answer.front}</p>
+              <p class="question" lang="es">${quizState.answer.front}</p>
               <div>
                 <form method="POST" class="options">
                   <input
@@ -38,7 +38,9 @@ app.get("/", (c) => {
                   )}
                 </form>
               </div>
-              <p class="quiz-row-next">&nbsp;</p>
+              <p class="quiz-row-next">
+                <a href="${c.req.path}" class="button dark">Continue</a>
+              </p>
             </div> `}
       `,
       navigation: c.get("nav"),
@@ -61,10 +63,12 @@ app.post("/", async (c) => {
   return c.html(
     layout({
       children: html`
+        <h2>Study all due cards (${getCardsDueCount(session.userId)})</h2>
+        <a href="${c.req.path.replace(/\/[^/]+$/, "")}">Back to decks</a>
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
           : html`<div class="quiz">
-              <p class="question">${quizState.answer.front}</p>
+              <p class="question" lang="es">${quizState.answer.front}</p>
               <div>
                 <div class="options">
                   ${quizState.options.map((o) => {
