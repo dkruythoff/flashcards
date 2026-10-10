@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { type AppEnv } from "@/app/types.ts";
-import { layout } from "@/views/index.ts";
+import { layout, quizView } from "@/views/index.ts";
 import { html } from "hono/html";
 import { assertSession } from "@/middleware/session.ts";
 import { createQuizState, getQuizState } from "@/db/quiz.ts";
@@ -21,24 +21,11 @@ app.get("/", (c) => {
         <a href="${c.req.path.replace(/\/[^/]+$/, "")}">Back to decks</a>
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
-          : html`<div class="quiz">
-              <p class="question" lang="es">${quizState.answer.front}</p>
-              <div>
-                <form method="POST" class="options">
-                  <input
-                    type="hidden"
-                    name="token"
-                    value="${quizState.token}"
-                  />
-                  ${quizState.options.map(
-                    (o) =>
-                      html`<button name="answer" value="${o.id}" class="option">
-                        ${o.back}
-                      </button>`,
-                  )}
-                </form>
-              </div>
-            </div> `}
+          : quizView({
+              answered: false,
+              currentPath: c.req.path,
+              quizState,
+            })}
       `,
       navigation: c.get("nav"),
       session: c.get("session"),
@@ -64,29 +51,11 @@ app.post("/", async (c) => {
         <a href="${c.req.path.replace(/\/[^/]+$/, "")}">Back to decks</a>
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
-          : html`<div class="quiz">
-              <p class="question" lang="es">${quizState.answer.front}</p>
-              <div>
-                <div class="options">
-                  ${quizState.options.map((o) => {
-                    return html`<p
-                      class="option ${[
-                        o.isAnswer ? "is-answer" : "",
-                        o.isCorrect ? "is-correct" : "",
-                        o.isWrong ? "is-wrong" : "",
-                      ]
-                        .filter((s) => !!s)
-                        .join(" ")}"
-                    >
-                      ${o.back}
-                    </p>`;
-                  })}
-                </div>
-              </div>
-              <p class="quiz-row-next">
-                <a href="${c.req.path}" class="button dark">Continue</a>
-              </p>
-            </div> `}
+          : quizView({
+              answered: true,
+              currentPath: c.req.path,
+              quizState,
+            })}
       `,
       navigation: c.get("nav"),
       session: c.get("session"),

@@ -1,6 +1,8 @@
 import { html } from "hono/html";
 import type { NavItem, Session } from "@/middleware/index.ts";
 
+export * from "./quiz.ts";
+
 export const layout = (props: {
   children?: unknown;
   navigation?: NavItem[];

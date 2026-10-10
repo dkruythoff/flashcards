@@ -10,15 +10,15 @@ import type { Session } from "@/middleware/index.ts";
 import { MIN_CARDS_FOR_ASSIGNMENT } from "@/db/decks.ts";
 import { logAnswer } from "@/db/answers.ts";
 
-type QuizState = {
+export type QuizState = {
   answer: Card;
   options: Card[];
   token: string;
 };
-type QuizStateError = {
+export type QuizStateError = {
   error: string;
 };
-type QuizStateResponse = QuizState | QuizStateError;
+export type QuizStateResponse = QuizState | QuizStateError;
 
 const TIMEZONE = "Europe/Madrid"; // handles CET/CEST switching automatically
 
