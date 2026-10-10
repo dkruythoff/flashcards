@@ -23,7 +23,7 @@ const quizViewQuestion = ({ quizState }: { quizState: QuizState }) =>
         ${quizState.options.map(
           (o) =>
             html`<button name="answer" value="${o.id}" class="option">
-              ${o.back}
+              ${o.back.replaceAll("/", "/\u200B")}
             </button>`,
         )}
       </form>
@@ -51,7 +51,7 @@ const quizViewAnswer = ({
               .filter((s) => !!s)
               .join(" ")}"
           >
-            ${o.back}
+            ${o.back.replaceAll("/", "/\u200B")}
           </p>`;
         })}
       </div>
