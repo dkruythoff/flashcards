@@ -38,9 +38,6 @@ app.get("/", (c) => {
                   )}
                 </form>
               </div>
-              <p class="quiz-row-next">
-                <a href="${c.req.path}" class="button dark">Continue</a>
-              </p>
             </div> `}
       `,
       navigation: c.get("nav"),
