@@ -84,7 +84,8 @@ FROM
   cards AS c
   JOIN deck_assignments AS da ON da.deck_id = c.deck_id AND da.student_id = ?
 WHERE
-  id != ?
+  c.back != (SELECT back from cards WHERE id = ?) COLLATE NOCASE
+GROUP BY c.back COLLATE NOCASE
 ORDER BY
   RANDOM()
 LIMIT
