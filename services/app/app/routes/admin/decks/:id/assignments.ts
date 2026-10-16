@@ -94,5 +94,6 @@ const viewDeckAssigments = ({
           )}
         </dl>`
       : html`<p>
-          This deck needs at least ${minCards} cards to be assigned.
+          This deck needs at least ${minCards} cards with distinct backs to be
+          assigned.
         </p>`}`;

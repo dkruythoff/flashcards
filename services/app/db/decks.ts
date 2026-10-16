@@ -27,8 +27,15 @@ export const getDeckCardCount = (deckId: number) =>
       .get(deckId) as { count: number }
   ).count;
 
+export const getDeckDistinctBackCount = (deckId: number) =>
+  db
+    .prepare(
+      "SELECT COUNT(DISTINCT back COLLATE NOCASE) AS count FROM cards WHERE deck_id = ?",
+    )
+    .get<{ count: number }>(deckId)?.count ?? 0;
+
 export const isDeckAssignable = (deckId: number) =>
-  getDeckCardCount(deckId) >= MIN_CARDS_FOR_ASSIGNMENT;
+  getDeckDistinctBackCount(deckId) >= MIN_CARDS_FOR_ASSIGNMENT;
 
 export const createDeck = (name: string, ownerId: number) =>
   !!db.exec("INSERT INTO decks (name, owner_id) VALUES (?, ?)", name, ownerId);
