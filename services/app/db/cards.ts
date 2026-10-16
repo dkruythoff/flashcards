@@ -133,7 +133,9 @@ FROM
   cards AS c
 WHERE
   c.deck_id = ?
-  AND c.id != ?
+  AND c.back != (SELECT back from cards WHERE id = ?) COLLATE NOCASE
+GROUP BY
+  c.back COLLATE NOCASE
 ORDER BY
   RANDOM()
 LIMIT
