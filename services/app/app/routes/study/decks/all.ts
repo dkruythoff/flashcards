@@ -33,7 +33,7 @@ app.get("/", (c) => {
                   ${quizState.options.map(
                     (o) =>
                       html`<button name="answer" value="${o.id}" class="option">
-                        ${o.back}
+                        ${o.back.replaceAll("/", "​/​")}
                       </button>`,
                   )}
                 </form>
@@ -78,7 +78,7 @@ app.post("/", async (c) => {
                         .filter((s) => !!s)
                         .join(" ")}"
                     >
-                      ${o.back}
+                      ${o.back.replaceAll("/", "​/​")}
                     </p>`;
                   })}
                 </div>
