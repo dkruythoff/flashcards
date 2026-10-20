@@ -152,6 +152,8 @@ input {
         font-weight: 700;
         padding: 0.5em 1em 0.5em 2em;
         margin: 0;
+        min-width: 0;
+        overflow-wrap: anywhere;
         position: relative;
         text-align: left;
 
