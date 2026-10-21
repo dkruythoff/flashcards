@@ -1,62 +1,74 @@
 import { html } from "hono/html";
 import type { QuizState } from "@/db/quiz.ts";
+import { type Context } from "hono";
 
 export const quizView = ({
-  answered,
-  currentPath,
+  c,
+  isForm,
   quizState,
 }: {
-  answered: boolean;
-  currentPath: string;
-  quizState: QuizState;
-}) =>
-  answered
-    ? quizViewAnswer({ currentPath, quizState })
-    : quizViewQuestion({ quizState });
-
-const quizViewQuestion = ({ quizState }: { quizState: QuizState }) =>
-  html`<div class="quiz">
-    <p class="question" lang="es">${quizState.answer.front}</p>
-    <div>
-      <form method="POST" class="options">
-        <input type="hidden" name="token" value="${quizState.token}" />
-        ${quizState.options.map(
-          (o) =>
-            html`<button name="answer" value="${o.id}" class="option">
-              ${o.back.replaceAll("/", "/\u200B")}
-            </button>`,
-        )}
-      </form>
-    </div>
-  </div>`;
-
-const quizViewAnswer = ({
-  currentPath,
-  quizState,
-}: {
-  currentPath: string;
+  c: Context;
+  isForm: boolean;
   quizState: QuizState;
 }) =>
   html`<div class="quiz">
     <p class="question" lang="es">${quizState.answer.front}</p>
     <div>
-      <div class="options">
-        ${quizState.options.map((o) => {
-          return html`<p
-            class="option ${[
-              o.isAnswer ? "is-answer" : "",
-              o.isCorrect ? "is-correct" : "",
-              o.isWrong ? "is-wrong" : "",
-            ]
-              .filter((s) => !!s)
-              .join(" ")}"
-          >
-            ${o.back.replaceAll("/", "/\u200B")}
-          </p>`;
-        })}
-      </div>
+      ${optionListView({
+        children: quizState.options.map((o) =>
+          optionView({
+            isForm,
+            option: o,
+            children: o.back.replaceAll("/", "/\u200B"),
+          }),
+        ),
+        isForm,
+        token: quizState.token,
+      })}
     </div>
-    <p class="quiz-row-next">
-      <a href="${currentPath}" class="button dark">Continue</a>
-    </p>
+    ${!isForm &&
+    html`<p class="quiz-row-next">
+      <a href="${c.req.path}" class="button dark">Continue</a>
+    </p>`}
   </div>`;
+
+const optionListView = ({
+  children,
+  isForm,
+  token,
+}: {
+  children: unknown;
+  isForm: boolean;
+  token?: string;
+}) =>
+  isForm
+    ? html`<form method="POST" class="options">
+        ${token && html`<input type="hidden" name="token" value="${token}" />`}
+        ${children}
+      </form>`
+    : html`<div class="options">${children}</div>`;
+
+const optionView = ({
+  children,
+  isForm,
+  option,
+}: {
+  children: unknown;
+  isForm: boolean;
+  option: QuizState["options"][0];
+}) =>
+  isForm
+    ? html`<button name="answer" value="${option.id}" class="option">
+        ${children}
+      </button>`
+    : html`<p
+        class="option ${[
+          option.isAnswer ? "is-answer" : "",
+          option.isCorrect ? "is-correct" : "",
+          option.isWrong ? "is-wrong" : "",
+        ]
+          .filter((s) => !!s)
+          .join(" ")}"
+      >
+        ${children}
+      </p>`;

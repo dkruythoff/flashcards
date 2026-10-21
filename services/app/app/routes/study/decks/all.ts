@@ -22,8 +22,8 @@ app.get("/", (c) => {
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
           : quizView({
-              answered: false,
-              currentPath: c.req.path,
+              c,
+              isForm: true,
               quizState,
             })}
       `,
@@ -52,8 +52,8 @@ app.post("/", async (c) => {
         ${"error" in quizState
           ? html`<p>${quizState.error}</p>`
           : quizView({
-              answered: true,
-              currentPath: c.req.path,
+              c,
+              isForm: false,
               quizState,
             })}
       `,
