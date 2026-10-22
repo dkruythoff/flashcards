@@ -229,15 +229,18 @@ input {
         padding: 1em;
         display: grid;
         grid-template-columns: 1fr 3fr;
-        grid-template-areas: "title title" "count meter";
+        grid-template-areas: "title title" "count meter" "practice practice";
 
         &>h3 {
             grid-area: title;
             margin: 0 0 0.5em 0;
         }
 
-        .count {
+        .count-wrapper {
             grid-area: count;
+        }
+
+        .count {
             display: grid;
             align-items: center;
             grid-template-columns: auto 1fr;
@@ -252,11 +255,14 @@ input {
             }
         }
 
+        .meter-wrapper {
+            grid-area: meter;
+        }
+
         .meter {
             --pct-g: 50%;
             --pct-w: 50%;
             --radius: 0.5em;
-            grid-area: meter;
             display: grid;
             align-items: center;
 
@@ -296,6 +302,15 @@ input {
             &[data-w="0"] .g {
                 border-radius: var(--radius);
             }
+        }
+
+        .practice-wrapper {
+            grid-area: practice;
+        }
+
+        .practice-btn {
+            margin-top: 1rem;
+            width: 100%;
         }
     }
 }

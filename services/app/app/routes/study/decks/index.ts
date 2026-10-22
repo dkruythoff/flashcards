@@ -4,9 +4,10 @@ import all from "./all.ts";
 import { layout } from "@/views/index.ts";
 import { html } from "hono/html";
 import { getAssignedDecksWithMetrics } from "@/db/decks.ts";
-import { assertSession } from "@/middleware/index.ts";
+import { assertSession, loadDeck } from "@/middleware/index.ts";
 import { getCardsDueCount } from "@/db/cards.ts";
 import { getNextCardDueMessage } from "@/db/quiz.ts";
+import { default as deckStudy } from "@/app/routes/study/decks/:id/index.ts";
 
 const app = new Hono<AppEnv>();
 
@@ -33,21 +34,34 @@ app.get("/", (c) => {
                   (d) =>
                     html`<li class="deck">
                       <h3>${d.name}</h3>
-                      <span class="count">
-                        <i class="icon" aria-hidden="true"></i>
-                        ${d.card_count}
+                      <span class="count-wrapper">
+                        Cards<br />
+                        <span class="count">
+                          <i class="icon" aria-hidden="true"></i>
+                          ${d.card_count}
+                        </span>
                       </span>
-                      ${d.answered === 0
-                        ? html`<span>Not started yet.</span>`
-                        : html`<span
-                            class="meter"
-                            style="--pct-g:${d.correct_pct}%;--pct-w:${d.wrong_pct}%"
-                            data-g="${d.correct_pct}"
-                            data-w="${d.wrong_pct}"
-                          >
-                            <span class="g">${d.correct}</span>
-                            <span class="w">${d.wrong}</span>
-                          </span>`}
+                      <span>
+                        Answered<br />
+                        ${d.answered === 0
+                          ? html`<span>Not started yet.</span>`
+                          : html`<span
+                              class="meter"
+                              style="--pct-g:${d.correct_pct}%;--pct-w:${d.wrong_pct}%"
+                              data-g="${d.correct_pct}"
+                              data-w="${d.wrong_pct}"
+                            >
+                              <span class="g">${d.correct}</span>
+                              <span class="w">${d.wrong}</span>
+                            </span>`}
+                      </span>
+                      <span class="practice-wrapper">
+                        <a
+                          href="${c.req.path}/${d.deck_id}"
+                          class="button dark practice-btn"
+                          >Practice deck</a
+                        >
+                      </span>
                     </li>`,
                 )}
               </ul>`}`,
@@ -57,6 +71,10 @@ app.get("/", (c) => {
     }),
   );
 });
+
 app.route("/all", all);
+
+app.use("/:id/*", loadDeck("/study/decks"));
+app.route("/:id", deckStudy);
 
 export default app;

@@ -4,7 +4,7 @@ import { layout } from "@/views/index.ts";
 import { html } from "hono/html";
 import { createDeck, type Deck, getDecks } from "@/db/decks.ts";
 import { default as detail } from "@/app/routes/admin/decks/:id/index.ts";
-import { loadDeck } from "./middleware.ts";
+import { loadDeck } from "@/middleware/index.ts";
 
 const app = new Hono<AppEnv>();
 
@@ -29,7 +29,7 @@ app.post("/", async (c) => {
   return c.redirect(c.req.path);
 });
 
-app.use("/:id/*", loadDeck);
+app.use("/:id/*", loadDeck("/admin/decks"));
 app.route("/:id", detail);
 
 export default app;

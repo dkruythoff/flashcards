@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { layout } from "@/views/index.ts";
-import { type DeckEnv } from "../types.ts";
 import { html } from "hono/html";
 import {
   assignToUser,
@@ -11,6 +10,7 @@ import {
   type DeckAssignment,
 } from "@/db/decks.ts";
 import { getUser } from "@/db/users.ts";
+import type { DeckEnv } from "@/app/types.ts";
 
 const app = new Hono<DeckEnv>();
 
