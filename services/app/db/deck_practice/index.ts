@@ -10,13 +10,15 @@ import {
   type PracticeRecordRaw,
 } from "./record.ts";
 
+export type PracticeQuizState = { answer: Card; options: Card[] };
+
 type PracticeStatus =
   | { status: "new" }
   | {
       status: "active";
       remainingCardIds: number[];
       answerIds: number[];
-      pending: { card: Card; options: Card[] };
+      pending: PracticeQuizState;
     }
   | { status: "finished"; answerIds: number[] };
 
@@ -37,7 +39,7 @@ const classifyPracticeRecord = (
 
 type PracticeState = {
   remainingCardIds: number[];
-  pending: { card: Card; options: Card[] };
+  pending: PracticeQuizState;
   answerIds: number[];
 };
 
@@ -94,7 +96,7 @@ const gradeAndAdvance = (
 
   const answerId = logAnswer(
     session.userId,
-    status.pending.card.id,
+    status.pending.answer.id,
     JSON.stringify(status.pending.options.map((o) => o.id)),
     givenAnswerId,
     "practice",

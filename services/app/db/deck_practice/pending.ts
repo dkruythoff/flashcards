@@ -1,15 +1,12 @@
 import { getCards, getExtraCardsPractice, type Card } from "@/db/cards.ts";
+import type { PracticeQuizState } from "@/db/deck_practice/index.ts";
 
 type PendingIds = { cardId: number; optionIds: number[] };
-export type PracticeStatePending = {
-  card: Card;
-  options: Card[];
-};
 
 export const pendingParse = (
   pending: string,
   givenAnswerId = -1,
-): PracticeStatePending => {
+): PracticeQuizState => {
   const pendingIds = JSON.parse(pending) as PendingIds;
 
   const fetchedCards = new Map(
@@ -24,15 +21,15 @@ export const pendingParse = (
       const isWrong = !isAnswer && givenAnswerId === o.id;
       return Object.assign(o, { isAnswer, isCorrect, isWrong });
     });
-  const card = options.find((o) => o.id === pendingIds.cardId) as Card;
+  const answer = options.find((o) => o.id === pendingIds.cardId) as Card;
 
-  return { card, options };
+  return { answer, options };
 };
 
-export const pendingSerialize = (pending: PracticeStatePending | null) => {
+export const pendingSerialize = (pending: PracticeQuizState | null) => {
   if (!pending) return null;
   const payload = {
-    cardId: pending.card.id,
+    cardId: pending.answer.id,
     optionIds: pending.options.map((o) => o.id),
   };
   return JSON.stringify(payload);
@@ -41,9 +38,9 @@ export const pendingSerialize = (pending: PracticeStatePending | null) => {
 export const pendingGenerate = (
   deckId: number,
   cardId: number,
-): PracticeStatePending => {
-  const card = getCards(cardId)[0];
+): PracticeQuizState => {
+  const answer = getCards(cardId)[0];
   const wrongAnswers = getExtraCardsPractice(deckId, cardId);
-  const options = [card, ...wrongAnswers].sort(() => Math.random() - 0.5);
-  return { card, options };
+  const options = [answer, ...wrongAnswers].sort(() => Math.random() - 0.5);
+  return { answer, options };
 };
