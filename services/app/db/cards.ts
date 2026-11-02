@@ -47,7 +47,8 @@ WHERE
     rs.due_at IS NULL
     OR rs.due_at <= datetime('now')
 ORDER BY
-    COALESCE(rs.due_at, '0000-01-01') ASC
+    rs.due_at IS NULL,
+    rs.due_at ASC
 LIMIT
     1`,
     )
