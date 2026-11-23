@@ -47,7 +47,8 @@ WHERE
     rs.due_at IS NULL
     OR rs.due_at <= datetime('now')
 ORDER BY
-    COALESCE(rs.due_at, '0000-01-01') ASC
+    rs.due_at IS NULL,
+    rs.due_at ASC
 LIMIT
     1`,
     )
@@ -197,20 +198,22 @@ WHERE
     )
     .get<{ due_count: number }>(userId)?.due_count ?? 0;
 
-export const cardBelongsToDeck = (cardId: number, deckId: number) => {
-  const count =
-    db
-      .prepare(
-        `
-SELECT
-  COUNT(*) as count
-FROM
-  cards
-WHERE
-  id = ?
-  AND deck_id = ?
+export const getDueForecast = (userId: number) =>
+  db
+    .prepare(
+      `
+  SELECT
+    COALESCE(SUM(rs.due_at <= datetime('now', '+1 day')), 0) AS next_24h,
+    COALESCE(SUM(rs.due_at >  datetime('now', '+1 day') AND rs.due_at <= datetime('now', '+7 days')), 0) AS this_week,
+    COALESCE(SUM(rs.due_at >  datetime('now', '+7 days')), 0) AS later
+  FROM review_state AS rs
+    JOIN cards AS c ON c.id = rs.card_id
+    JOIN deck_assignments AS da ON da.deck_id = c.deck_id AND da.student_id = rs.user_id
+  WHERE rs.user_id = ? AND rs.due_at > datetime('now')
   `,
-      )
-      .get<{ count: number }>(cardId, deckId)?.count || 0;
-  return count > 0;
-};
+    )
+    .get<{ next_24h: number; this_week: number; later: number }>(userId) ?? {
+    next_24h: 0,
+    this_week: 0,
+    later: 0,
+  };

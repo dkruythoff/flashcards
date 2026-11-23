@@ -5,7 +5,7 @@ import { layout } from "@/views/index.ts";
 import { html } from "hono/html";
 import { getAssignedDecksWithMetrics } from "@/db/decks.ts";
 import { assertSession, loadDeck } from "@/middleware/index.ts";
-import { getCardsDueCount } from "@/db/cards.ts";
+import { getCardsDueCount, getDueForecast } from "@/db/cards.ts";
 import { getNextCardDueMessage } from "@/db/quiz.ts";
 import { default as deckStudy } from "@/app/routes/study/decks/:id/index.ts";
 
@@ -16,6 +16,7 @@ app.get("/", (c) => {
   assertSession(session);
   const decks = getAssignedDecksWithMetrics(session.userId);
   const cardsDue = getCardsDueCount(session.userId);
+  const forecast = getDueForecast(session.userId);
 
   return c.html(
     layout({
@@ -29,6 +30,13 @@ app.get("/", (c) => {
                       Study all - ${cardsDue} due now (Leitner method)
                     </a>`}
               </p>
+              ${forecast.next_24h + forecast.this_week + forecast.later > 0
+                ? html`<p>
+                    Cards coming up: ${forecast.next_24h} in the next 24 hours ·
+                    ${forecast.this_week} in the next week · ${forecast.later}
+                    after that
+                  </p>`
+                : ""}
               <ul class="deck-list">
                 ${decks.map(
                   (d) =>
