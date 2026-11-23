@@ -146,12 +146,7 @@ export const getQuizState = (
   const options = optionIds
     .map((id) => fetchedCards.get(id))
     .filter((c): c is Card => c !== undefined)
-    .map((o) => {
-      const isAnswer = o.id === quizStateRecord.card_id;
-      const isCorrect = isAnswer && givenAnswerId === o.id;
-      const isWrong = !isAnswer && givenAnswerId === o.id;
-      return Object.assign(o, { isAnswer, isCorrect, isWrong });
-    });
+    .map((o) => decorateOption(o, quizStateRecord.card_id, givenAnswerId));
 
   if (options.length !== MIN_CARDS_FOR_ASSIGNMENT)
     return { error: "Failed to retrieve cards." };
@@ -176,6 +171,18 @@ export const getQuizState = (
     options,
     token: question_token,
   };
+};
+
+export const decorateOption = (
+  option: Card,
+  answerId: number,
+  givenAnswerId: number,
+) => {
+  if (givenAnswerId < 0) return option;
+  const isAnswer = option.id === answerId;
+  const isCorrect = isAnswer && givenAnswerId === option.id;
+  const isWrong = !isAnswer && givenAnswerId === option.id;
+  return Object.assign(option, { isAnswer, isCorrect, isWrong });
 };
 
 const BOX_INTERVAL_STR = [

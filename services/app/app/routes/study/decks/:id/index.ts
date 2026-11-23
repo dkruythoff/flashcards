@@ -1,11 +1,26 @@
 import { Hono } from "hono";
 import { layout, quizView } from "@/views/index.ts";
 import type { DeckEnv } from "@/app/types.ts";
-import { getPracticeState } from "@/db/deck_practice/index.ts";
+import {
+  getPracticeState,
+  submitPracticeAnswer,
+} from "@/db/deck_practice/index.ts";
 import { assertSession } from "@/middleware/session.ts";
 import { html } from "hono/html";
 
 const app = new Hono<DeckEnv>();
+
+const title = (
+  deckName: string,
+  practiceState:
+    | ReturnType<typeof getPracticeState>
+    | ReturnType<typeof submitPracticeAnswer>,
+) =>
+  html`<h2>
+    Deck:
+    ${deckName}${"pending" in practiceState &&
+    ` | Practice, ${practiceState.remainingCardIds.length} cards after this one`}
+  </h2>`;
 
 app.get("/", (c) => {
   const session = c.get("session");
@@ -15,7 +30,7 @@ app.get("/", (c) => {
   return c.html(
     layout({
       children: html`
-        <h2>Deck: ${deck.name}</h2>
+        ${title(deck.name, practiceState)}
         <a href="${c.req.path.replace(/\/[^/]+$/, "")}">Back to decks</a>
         ${"pending" in practiceState
           ? quizView({
@@ -24,7 +39,6 @@ app.get("/", (c) => {
               quizState: practiceState.pending,
             })
           : html`State: ${practiceState.status}`}
-        <pre>${JSON.stringify(practiceState, undefined, 2)}</pre>
       `,
       title: `Deck: ${deck.name}`,
       navigation: c.get("nav"),
@@ -33,10 +47,32 @@ app.get("/", (c) => {
   );
 });
 
-app.post("/", (c) => {
+app.post("/", async (c) => {
   const session = c.get("session");
   assertSession(session);
   const deck = c.get("deck");
+  const body = await c.req.parseBody();
+  const answer = Number(body.answer);
+  const practiceState = submitPracticeAnswer(session, deck.id, answer);
+  if ("redirect" in practiceState) return c.redirect(c.req.path);
+  return c.html(
+    layout({
+      children: html`
+        ${title(deck.name, practiceState)}
+        <a href="${c.req.path.replace(/\/[^/]+$/, "")}">Back to decks</a>
+        ${"pending" in practiceState
+          ? quizView({
+              c,
+              isForm: false,
+              quizState: practiceState.pending,
+            })
+          : html`State: ${practiceState.status}`}
+      `,
+      title: `Deck: ${deck.name}`,
+      navigation: c.get("nav"),
+      session: c.get("session"),
+    }),
+  );
 });
 
 export default app;

@@ -1,5 +1,5 @@
 import type { Session } from "@/middleware/index.ts";
-import { cardBelongsToDeck, type Card } from "@/db/cards.ts";
+import { type Card } from "@/db/cards.ts";
 import { getDeckCardIds, isDeckAssignedToUser } from "@/db/decks.ts";
 import { logAnswer } from "@/db/answers.ts";
 import { pendingGenerate, pendingParse } from "./pending.ts";
@@ -24,6 +24,7 @@ type PracticeStatus =
 
 const classifyPracticeRecord = (
   record: PracticeRecordRaw | undefined,
+  givenAnswerId: number = -1,
 ): PracticeStatus => {
   if (!record) return { status: "new" };
   const remainingCardIds = JSON.parse(record.remaining_card_ids);
@@ -33,7 +34,7 @@ const classifyPracticeRecord = (
     status: "active",
     remainingCardIds,
     answerIds,
-    pending: pendingParse(record.pending),
+    pending: pendingParse(record.pending, givenAnswerId),
   };
 };
 
@@ -44,19 +45,11 @@ type PracticeState = {
 };
 
 export class AnswerNotInOptionsError extends Error {}
-export class AnswerNotInDeckError extends Error {}
 export class DeckNotAssignedError extends Error {}
 
-export const getPracticeState = (
-  session: Session,
-  deckId: number,
-  givenAnswerId: number = -1,
-) => {
+export const getPracticeState = (session: Session, deckId: number) => {
   if (!isDeckAssignedToUser(deckId, session.userId))
     throw new DeckNotAssignedError("Deck not assigned to user");
-
-  if (givenAnswerId > -1 && !cardBelongsToDeck(givenAnswerId, deckId))
-    throw new AnswerNotInDeckError("Given answer not within deck");
 
   const status = classifyPracticeRecord(retrieveRecord(session, deckId));
   switch (status.status) {
@@ -74,7 +67,13 @@ export const submitPracticeAnswer = (
   deckId: number,
   givenAnswerId: number,
 ) => {
-  const status = classifyPracticeRecord(retrieveRecord(session, deckId));
+  if (!isDeckAssignedToUser(deckId, session.userId))
+    throw new DeckNotAssignedError("Deck not assigned to user");
+
+  const status = classifyPracticeRecord(
+    retrieveRecord(session, deckId),
+    givenAnswerId,
+  );
   switch (status.status) {
     case "new":
     case "finished":

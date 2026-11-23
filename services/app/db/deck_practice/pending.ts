@@ -1,5 +1,6 @@
 import { getCards, getExtraCardsPractice, type Card } from "@/db/cards.ts";
 import type { PracticeQuizState } from "@/db/deck_practice/index.ts";
+import { decorateOption } from "@/db/quiz.ts";
 
 type PendingIds = { cardId: number; optionIds: number[] };
 
@@ -15,12 +16,7 @@ export const pendingParse = (
   const options = pendingIds.optionIds
     .map((id) => fetchedCards.get(id))
     .filter((c): c is Card => c !== undefined)
-    .map((o) => {
-      const isAnswer = o.id === pendingIds.cardId;
-      const isCorrect = isAnswer && givenAnswerId === o.id;
-      const isWrong = !isAnswer && givenAnswerId === o.id;
-      return Object.assign(o, { isAnswer, isCorrect, isWrong });
-    });
+    .map((o) => decorateOption(o, pendingIds.cardId, givenAnswerId));
   const answer = options.find((o) => o.id === pendingIds.cardId) as Card;
 
   return { answer, options };
