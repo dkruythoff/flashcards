@@ -64,11 +64,11 @@ app.get("/", (c) => {
                             </span>`}
                       </span>
                       <span class="practice-wrapper">
-                        <a
+                        <!-- <a
                           href="${c.req.path}/${d.deck_id}"
                           class="button dark practice-btn"
                           >Practice deck</a
-                        >
+                        > -->
                       </span>
                     </li>`,
                 )}
