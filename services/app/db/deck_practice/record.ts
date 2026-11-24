@@ -1,12 +1,11 @@
 import type { Session } from "@/middleware/session.ts";
 import { db } from "@/db/index.ts";
-import { pendingSerialize } from "./pending.ts";
-import type { PracticeQuizState } from "@/db/deck_practice/index.ts";
+import { pendingSerialize, type PracticePendingState } from "./pending.ts";
 
 export const updateRecord = (
   session: Session,
   deckId: number,
-  pending: PracticeQuizState | null,
+  pending: PracticePendingState | null,
   remainingCardIds: number[],
   answerIds?: number[],
 ) =>
@@ -47,7 +46,7 @@ export const insertRecord = (
   deckId: number,
   remainingCardIds: number[],
   answerIds: number[],
-  pending: PracticeQuizState,
+  pending: PracticePendingState,
 ) =>
   db.exec(
     `

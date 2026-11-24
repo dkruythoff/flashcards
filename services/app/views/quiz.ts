@@ -1,7 +1,7 @@
 import { html } from "hono/html";
 import { type Context } from "hono";
 import type { QuizState } from "@/db/quiz.ts";
-import type { PracticeQuizState } from "@/db/deck_practice/index.ts";
+import type { PracticePendingState } from "@/db/deck_practice/pending.ts";
 
 export const quizView = ({
   c,
@@ -10,7 +10,7 @@ export const quizView = ({
 }: {
   c: Context;
   isForm: boolean;
-  quizState: QuizState | PracticeQuizState;
+  quizState: QuizState | PracticePendingState;
 }) =>
   html`<div class="quiz">
     <p class="question" lang="es">${quizState.answer.front}</p>

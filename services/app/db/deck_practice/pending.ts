@@ -1,32 +1,41 @@
 import { getCards, getExtraCardsPractice, type Card } from "@/db/cards.ts";
-import type { PracticeQuizState } from "@/db/deck_practice/index.ts";
 import { decorateOption } from "@/db/quiz.ts";
 
-type PendingIds = { cardId: number; optionIds: number[] };
+export type PracticePendingState = {
+  answer: Card;
+  options: Card[];
+  token: string;
+};
+type PracticePendingRef = {
+  cardId: number;
+  optionIds: number[];
+  token: string;
+};
 
 export const pendingParse = (
   pending: string,
   givenAnswerId = -1,
-): PracticeQuizState => {
-  const pendingIds = JSON.parse(pending) as PendingIds;
+): PracticePendingState => {
+  const pendingRef = JSON.parse(pending) as PracticePendingRef;
 
   const fetchedCards = new Map(
-    getCards(...pendingIds.optionIds).map((c) => [c.id, c]),
+    getCards(...pendingRef.optionIds).map((c) => [c.id, c]),
   );
-  const options = pendingIds.optionIds
+  const options = pendingRef.optionIds
     .map((id) => fetchedCards.get(id))
     .filter((c): c is Card => c !== undefined)
-    .map((o) => decorateOption(o, pendingIds.cardId, givenAnswerId));
-  const answer = options.find((o) => o.id === pendingIds.cardId) as Card;
+    .map((o) => decorateOption(o, pendingRef.cardId, givenAnswerId));
+  const answer = options.find((o) => o.id === pendingRef.cardId) as Card;
 
-  return { answer, options };
+  return { answer, options, token: pendingRef.token };
 };
 
-export const pendingSerialize = (pending: PracticeQuizState | null) => {
+export const pendingSerialize = (pending: PracticePendingState | null) => {
   if (!pending) return null;
   const payload = {
     cardId: pending.answer.id,
     optionIds: pending.options.map((o) => o.id),
+    token: pending.token,
   };
   return JSON.stringify(payload);
 };
@@ -34,9 +43,9 @@ export const pendingSerialize = (pending: PracticeQuizState | null) => {
 export const pendingGenerate = (
   deckId: number,
   cardId: number,
-): PracticeQuizState => {
+): PracticePendingState => {
   const answer = getCards(cardId)[0];
   const wrongAnswers = getExtraCardsPractice(deckId, cardId);
   const options = [answer, ...wrongAnswers].sort(() => Math.random() - 0.5);
-  return { answer, options };
+  return { answer, options, token: crypto.randomUUID() };
 };

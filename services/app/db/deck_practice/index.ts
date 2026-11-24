@@ -1,8 +1,11 @@
 import type { Session } from "@/middleware/index.ts";
-import { type Card } from "@/db/cards.ts";
 import { getDeckCardIds, isDeckAssignedToUser } from "@/db/decks.ts";
 import { logAnswer } from "@/db/answers.ts";
-import { pendingGenerate, pendingParse } from "./pending.ts";
+import {
+  pendingGenerate,
+  pendingParse,
+  type PracticePendingState,
+} from "./pending.ts";
 import {
   insertRecord,
   retrieveRecord,
@@ -10,15 +13,13 @@ import {
   type PracticeRecordRaw,
 } from "./record.ts";
 
-export type PracticeQuizState = { answer: Card; options: Card[] };
-
 type PracticeStatus =
   | { status: "new" }
   | {
       status: "active";
       remainingCardIds: number[];
       answerIds: number[];
-      pending: PracticeQuizState;
+      pending: PracticePendingState;
     }
   | { status: "finished"; answerIds: number[] };
 
@@ -40,7 +41,7 @@ const classifyPracticeRecord = (
 
 type PracticeState = {
   remainingCardIds: number[];
-  pending: PracticeQuizState;
+  pending: PracticePendingState;
   answerIds: number[];
 };
 
@@ -66,6 +67,7 @@ export const submitPracticeAnswer = (
   session: Session,
   deckId: number,
   givenAnswerId: number,
+  token: string,
 ) => {
   if (!isDeckAssignedToUser(deckId, session.userId))
     throw new DeckNotAssignedError("Deck not assigned to user");
@@ -79,7 +81,12 @@ export const submitPracticeAnswer = (
     case "finished":
       return { redirect: true }; // nothing valid to grade, bounce to GET
     case "active":
-      return gradeAndAdvance(session, deckId, status, givenAnswerId); // Active × POST
+      if (token !== status.pending.token)
+        // token mismatch, bounce to GET
+        return { redirect: true };
+
+      // Active × POST
+      return gradeAndAdvance(session, deckId, status, givenAnswerId);
   }
 };
 

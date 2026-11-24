@@ -53,8 +53,11 @@ app.post("/", async (c) => {
   const deck = c.get("deck");
   const body = await c.req.parseBody();
   const answer = Number(body.answer);
-  const practiceState = submitPracticeAnswer(session, deck.id, answer);
+  const token = typeof body.token === "string" ? body.token : "";
+  const practiceState = submitPracticeAnswer(session, deck.id, answer, token);
+
   if ("redirect" in practiceState) return c.redirect(c.req.path);
+
   return c.html(
     layout({
       children: html`
